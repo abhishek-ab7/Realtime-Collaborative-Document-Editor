@@ -11,7 +11,7 @@ A modern collaborative document editor with real-time sync.
 ## Sitemap
 
 - [x] Landing Page (index)
-- [ ] Sign-In Page
+- [x] Sign-In Page
 - [ ] Dashboard
 - [ ] Editor Page
 - [ ] Share Dialog

@@ -3,6 +3,7 @@ import { createServer } from 'http';
 import { Server } from 'socket.io';
 import cors from 'cors';
 import pino from 'pino';
+import { socketAuthMiddleware } from './middleware/auth';
 
 const logger = pino({
   level: process.env.LOG_LEVEL || 'info',
@@ -39,7 +40,8 @@ const io = new Server(httpServer, {
   pingInterval: 25000,
 });
 
-// TODO: Phase 4 — Add auth middleware
+io.use(socketAuthMiddleware);
+
 // TODO: Phase 4 — Add room handlers
 // TODO: Phase 4 — Add collaboration handlers
 // TODO: Phase 5 — Add awareness handlers

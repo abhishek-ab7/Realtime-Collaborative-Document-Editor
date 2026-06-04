@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { Inter, JetBrains_Mono, Geist } from 'next/font/google';
 import './globals.css';
 import { cn } from '@/lib/utils';
+import { SessionProvider } from '@/components/providers/session-provider';
 
 const geist = Geist({ subsets: ['latin'], variable: '--font-sans' });
 
@@ -39,7 +40,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       lang="en"
       className={cn(inter.variable, jetbrainsMono.variable, 'font-sans', geist.variable)}
     >
-      <body className="min-h-screen bg-[var(--color-bg-primary)] antialiased">{children}</body>
+      <body className="min-h-screen bg-[var(--color-bg-primary)] antialiased">
+        <SessionProvider>{children}</SessionProvider>
+      </body>
     </html>
   );
 }
