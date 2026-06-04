@@ -12,12 +12,12 @@ A modern collaborative document editor with real-time sync.
 
 - [x] Landing Page (index)
 - [x] Sign-In Page
-- [ ] Dashboard
+- [x] Dashboard
 - [ ] Editor Page
 - [ ] Share Dialog
 - [ ] Version History Panel
-- [ ] Settings Page
-- [ ] Trash Page
+- [x] Settings Page
+- [x] Trash Page
 
 ## Roadmap
 
