@@ -52,7 +52,7 @@ describe('Document Server Actions', () => {
   });
 
   test('createDocument fails if user is unauthorized', async () => {
-    vi.mocked(auth).mockResolvedValue(null);
+    vi.mocked(auth).mockResolvedValue(null as any);
 
     await expect(createDocument()).rejects.toThrow('Unauthorized');
   });

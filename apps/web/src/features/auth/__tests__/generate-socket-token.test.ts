@@ -18,7 +18,7 @@ describe('generateSocketToken', () => {
   });
 
   test('returns null if there is no session', async () => {
-    vi.mocked(auth).mockResolvedValue(null);
+    vi.mocked(auth).mockResolvedValue(null as any);
 
     const token = await generateSocketToken();
     expect(token).toBeNull();
