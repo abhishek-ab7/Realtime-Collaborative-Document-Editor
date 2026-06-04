@@ -20,6 +20,16 @@ const CORS_ORIGIN = process.env.CORS_ORIGIN || 'http://localhost:3000';
 const app = express();
 app.use(cors({ origin: CORS_ORIGIN }));
 
+app.get('/', (_req, res) => {
+  res.json({
+    name: 'Collabdoc Collaboration Server',
+    status: 'healthy',
+    websocket: 'enabled',
+    uptime: process.uptime(),
+    healthCheck: '/health',
+  });
+});
+
 app.get('/health', (_req, res) => {
   res.json({
     status: 'ok',

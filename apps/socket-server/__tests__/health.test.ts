@@ -31,3 +31,15 @@ test('health endpoint returns 200 ok', async () => {
   expect(data.status).toBe('ok');
   expect(typeof data.uptime).toBe('number');
 });
+
+test('root endpoint returns server status info', async () => {
+  const response = await fetch(`http://localhost:${TEST_PORT}/`);
+  const data = await response.json();
+
+  expect(response.status).toBe(200);
+  expect(data.name).toBe('Collabdoc Collaboration Server');
+  expect(data.status).toBe('healthy');
+  expect(data.websocket).toBe('enabled');
+  expect(typeof data.uptime).toBe('number');
+  expect(data.healthCheck).toBe('/health');
+});
