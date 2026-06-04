@@ -1,0 +1,36 @@
+{
+  "name": "@collabdoc/socket-server",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "tsx watch src/index.ts",
+    "build": "tsup src/index.ts --format cjs --dts",
+    "start": "node dist/index.js",
+    "type-check": "tsc --noEmit",
+    "test": "vitest run",
+    "lint": "eslint src/"
+  },
+  "dependencies": {
+    "socket.io": "^4.8.0",
+    "express": "^5.0.0",
+    "cors": "^2.8.5",
+    "yjs": "^13.6.0",
+    "y-protocols": "^1.0.6",
+    "lib0": "^0.2.0",
+    "pino": "^9.0.0",
+    "pino-pretty": "^11.0.0",
+    "jsonwebtoken": "^9.0.0",
+    "@collabdoc/database": "*",
+    "@collabdoc/shared": "*"
+  },
+  "devDependencies": {
+    "typescript": "^5.5.0",
+    "tsx": "^4.0.0",
+    "tsup": "^8.0.0",
+    "@types/node": "^22.0.0",
+    "@types/express": "^5.0.0",
+    "@types/cors": "^2.8.0",
+    "@types/jsonwebtoken": "^9.0.0",
+    "vitest": "^3.0.0"
+  }
+}

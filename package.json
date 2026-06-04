@@ -1,0 +1,47 @@
+{
+  "name": "collabdoc",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "turbo dev",
+    "build": "turbo build",
+    "lint": "turbo lint",
+    "type-check": "turbo type-check",
+    "test": "turbo test",
+    "test:e2e": "playwright test",
+    "format": "prettier --write \"**/*.{ts,tsx,js,jsx,json,css,md}\"",
+    "format:check": "prettier --check \"**/*.{ts,tsx,js,jsx,json,css,md}\"",
+    "db:migrate": "cd packages/database && npx prisma migrate dev",
+    "db:push": "cd packages/database && npx prisma db push",
+    "db:seed": "cd packages/database && npx prisma db seed",
+    "db:studio": "cd packages/database && npx prisma studio",
+    "prepare": "husky"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.60.0",
+    "eslint": "^9.0.0",
+    "eslint-config-prettier": "^10.1.8",
+    "husky": "^9.0.0",
+    "lint-staged": "^15.0.0",
+    "prettier": "^3.5.0",
+    "prettier-plugin-tailwindcss": "^0.8.0",
+    "turbo": "^2.5.0",
+    "typescript-eslint": "^8.60.1"
+  },
+  "lint-staged": {
+    "*.{ts,tsx,js,jsx}": [
+      "eslint --fix",
+      "prettier --write"
+    ],
+    "*.{json,css,md}": [
+      "prettier --write"
+    ]
+  },
+  "packageManager": "npm@10.0.0",
+  "engines": {
+    "node": ">=20.9.0"
+  }
+}
