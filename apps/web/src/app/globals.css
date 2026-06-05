@@ -9,7 +9,7 @@
   /* Brand Colors — derived from Stitch DESIGN.md */
   --color-brand-primary: #6366f1; /* Indigo-500 */
   --color-brand-primary-hover: #4f46e5; /* Indigo-600 */
-  --color-brand-secondary: #8b5cf6; /* Violet-500 */
+  --color-brand-secondary: #14b8a6; /* Teal-500 */
   --color-brand-accent: #06b6d4; /* Cyan-500 */
 
   /* Neutrals */
@@ -415,7 +415,7 @@ body {
   font-family: var(--font-mono);
   font-size: 0.875em;
   padding: 0.15em 0.35em;
-  color: #7c3aed;
+  color: var(--color-brand-primary-hover);
 }
 
 /* Code blocks */
@@ -461,7 +461,7 @@ body {
   color: #f472b6;
 }
 .hljs-title {
-  color: #a78bfa;
+  color: #38bdf8;
 }
 
 /* Horizontal rule */

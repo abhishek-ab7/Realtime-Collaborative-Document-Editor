@@ -30,7 +30,7 @@ export default async function Home() {
       <header className="sticky top-0 z-40 border-b border-slate-200/80 bg-slate-50/80 backdrop-blur-md dark:border-slate-800/80 dark:bg-slate-950/80">
         <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
           <div className="flex items-center gap-2">
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-tr from-indigo-500 to-violet-600 text-white shadow-md shadow-indigo-500/20">
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-tr from-indigo-500 to-cyan-600 text-white shadow-md shadow-indigo-500/20">
               <FileText className="h-5.5 w-5.5" />
             </div>
             <span className="bg-gradient-to-r from-slate-900 to-slate-700 bg-clip-text text-xl font-bold tracking-tight text-transparent dark:from-white dark:to-slate-300">
@@ -88,7 +88,7 @@ export default async function Home() {
           {/* Heading */}
           <h1 className="mt-8 max-w-4xl text-4xl leading-[1.1] font-extrabold tracking-tight text-slate-900 sm:text-5xl md:text-6xl dark:text-white">
             Create, Edit & Collaborate.{' '}
-            <span className="bg-gradient-to-r from-indigo-500 via-violet-500 to-cyan-500 bg-clip-text text-transparent">
+            <span className="bg-gradient-to-r from-indigo-500 via-teal-500 to-cyan-500 bg-clip-text text-transparent">
               Together in Real-Time.
             </span>
           </h1>
@@ -266,7 +266,7 @@ export default async function Home() {
 
           {/* Feature 2: Active Presence */}
           <div className="group rounded-2xl border border-slate-200 bg-white p-6 shadow-sm transition-all hover:-translate-y-1 hover:shadow-md dark:border-slate-800 dark:bg-slate-900/50">
-            <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-violet-500/10 text-violet-600 dark:text-violet-400">
+            <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-cyan-500/10 text-cyan-600 dark:text-cyan-400">
               <Users className="h-6 w-6" />
             </div>
             <h3 className="mt-4 text-lg font-bold text-slate-900 dark:text-white">

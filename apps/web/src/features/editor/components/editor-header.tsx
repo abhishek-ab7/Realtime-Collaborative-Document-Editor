@@ -83,6 +83,8 @@ export function EditorHeader({
               onChange={(e) => setTitle(e.target.value)}
               onBlur={handleBlur}
               onKeyDown={handleKeyDown}
+              placeholder="Untitled Document"
+              aria-label="Rename Document"
               className="min-w-0 flex-1 rounded-md border border-[#4f46e5] bg-white px-2 py-0.5 text-base font-semibold text-[#0f172a] outline-none focus:ring-2 focus:ring-[#4f46e5]/20"
               data-testid="title-input"
             />

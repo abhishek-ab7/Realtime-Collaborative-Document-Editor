@@ -29,14 +29,15 @@ export function useDocumentEditor({
   const isCollaborative = !!yjsDoc;
   const typingTimerRef = useRef<NodeJS.Timeout | null>(null);
 
-  const userSerialized = user ? `${user.name}:${user.color}` : '';
+  const userName = user?.name;
+  const userColor = user?.color;
   const extensions = useMemo(() => {
     return getEditorExtensions({
       yjsDoc,
       awareness,
-      user,
+      user: userName && userColor ? { name: userName, color: userColor } : undefined,
     });
-  }, [yjsDoc, awareness, userSerialized]);
+  }, [yjsDoc, awareness, userName, userColor]);
 
   const editor = useTipTapEditor({
     extensions,

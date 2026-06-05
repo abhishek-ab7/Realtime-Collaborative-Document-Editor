@@ -3,13 +3,11 @@
 import { useEffect } from 'react';
 import { Editor } from '@/features/editor/components/editor';
 import { EditorHeader } from '@/features/editor/components/editor-header';
-import { SaveStatus } from '@/features/editor/components/save-status';
 import { OfflineBanner } from '@/features/editor/components/offline-banner';
 import {
   CollaborationProvider,
   useCollaborationContext,
 } from '@/features/collaboration/providers/collaboration-provider';
-import { ConnectionStatus } from '@/features/collaboration/components/connection-status';
 import { usePresence } from '@/features/collaboration/hooks/use-presence';
 import { PRESENCE_COLORS } from '@collabdoc/shared';
 import { useVersions, VersionItem } from '@/features/editor/hooks/use-versions';
@@ -109,7 +107,7 @@ function CollaborativeEditor({
       {isOffline && <OfflineBanner />}
 
       <main className="relative flex flex-1 overflow-hidden">
-        <div className="mx-auto w-full max-w-5xl flex-1">
+        <div className="mx-auto flex h-full w-full max-w-5xl flex-1 flex-col">
           <Editor
             editable={true}
             yjsDoc={doc}

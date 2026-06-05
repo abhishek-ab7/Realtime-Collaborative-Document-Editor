@@ -9,7 +9,7 @@ import type { ConnectionStatus } from '@collabdoc/yjs-utils';
 export function useConnectionStatus() {
   const { connectionStatus, isSynced, saveStatus } = useCollaboration();
 
-  const label = getStatusLabel(connectionStatus, isSynced, saveStatus);
+  const label = getStatusLabel(connectionStatus);
   const color = getStatusColor(connectionStatus);
 
   return {
@@ -21,7 +21,7 @@ export function useConnectionStatus() {
   };
 }
 
-function getStatusLabel(status: ConnectionStatus, synced: boolean, saveStatus: string): string {
+function getStatusLabel(status: ConnectionStatus): string {
   switch (status) {
     case 'disconnected':
       return 'Offline';
