@@ -1,6 +1,8 @@
 import { prisma } from '@collabdoc/database';
 import { MAX_SNAPSHOTS_PER_DOCUMENT } from '@collabdoc/shared';
 import { logger } from '../lib/logger';
+import { extractPlainText, countWords } from '../lib/text-utils';
+import * as Y from 'yjs';
 
 /** Load the latest Yjs state from PostgreSQL */
 export async function loadDocumentState(documentId: string): Promise<Uint8Array | null> {
@@ -20,14 +22,18 @@ export async function loadDocumentState(documentId: string): Promise<Uint8Array 
   }
 }
 
-/** Save Yjs state to PostgreSQL */
+/** Save Yjs state to PostgreSQL, updating word count and GC-ing old snapshots */
 export async function saveDocumentState(
   documentId: string,
   state: Uint8Array,
   stateVector: Uint8Array,
+  doc?: Y.Doc,
 ): Promise<void> {
   const stateBuffer = Buffer.from(state);
   const vectorBuffer = Buffer.from(stateVector);
+
+  // Derive word count from the live doc if provided
+  const wordCount = doc ? countWords(extractPlainText(doc)) : undefined;
 
   await prisma.$transaction(async (tx) => {
     // Create new snapshot
@@ -40,10 +46,13 @@ export async function saveDocumentState(
       },
     });
 
-    // Update document metadata
+    // Update document metadata (updatedAt + optional wordCount)
     await tx.document.update({
       where: { id: documentId },
-      data: { updatedAt: new Date() },
+      data: {
+        updatedAt: new Date(),
+        ...(wordCount !== undefined && { wordCount }),
+      },
     });
 
     // Garbage collect old snapshots (keep last N)
@@ -63,16 +72,17 @@ export async function saveDocumentState(
   });
 }
 
-/** Save with retry (exponential backoff) */
+/** Save with retry (exponential backoff, max 3 attempts) */
 export async function saveDocumentStateWithRetry(
   documentId: string,
   state: Uint8Array,
   stateVector: Uint8Array,
+  doc?: Y.Doc,
   maxRetries = 3,
 ): Promise<boolean> {
   for (let attempt = 1; attempt <= maxRetries; attempt++) {
     try {
-      await saveDocumentState(documentId, state, stateVector);
+      await saveDocumentState(documentId, state, stateVector, doc);
       return true;
     } catch (error) {
       const delay = Math.min(1000 * Math.pow(2, attempt - 1), 5000);

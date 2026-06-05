@@ -147,5 +147,43 @@ describe('Persistence', () => {
         where: { id: { in: ['old-1', 'old-2'] } },
       });
     });
+
+    it('updates word count when doc is provided', async () => {
+      const mockTx = {
+        documentSnapshot: {
+          create: vi.fn().mockResolvedValue({}),
+          findMany: vi.fn().mockResolvedValue([]),
+          deleteMany: vi.fn(),
+        },
+        document: {
+          update: vi.fn().mockResolvedValue({}),
+        },
+      };
+
+      mockPrisma.$transaction.mockImplementation(async (fn: any) => {
+        await fn(mockTx);
+      });
+
+      const state = new Uint8Array([10, 20, 30]);
+      const vector = new Uint8Array([1, 2]);
+
+      // We will mock countWords behavior or just pass a real Y.Doc
+      const Y = await import('yjs');
+      const doc = new Y.Doc();
+      const fragment = doc.getXmlFragment('default');
+      const paragraph = new Y.XmlElement('paragraph');
+      paragraph.insert(0, [new Y.XmlText('one two three')]);
+      fragment.insert(0, [paragraph]);
+
+      await saveDocumentState('doc-1', state, vector, doc);
+
+      expect(mockTx.document.update).toHaveBeenCalledWith({
+        where: { id: 'doc-1' },
+        data: {
+          updatedAt: expect.any(Date),
+          wordCount: 3,
+        },
+      });
+    });
   });
 });

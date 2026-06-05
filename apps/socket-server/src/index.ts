@@ -52,6 +52,9 @@ const io = new Server(httpServer, {
 
 io.use(socketAuthMiddleware);
 
+// Give room manager a reference to io for save-status broadcasts
+roomManager.setIO(io);
+
 io.on('connection', (socket) => {
   logger.info({ socketId: socket.id }, 'Client connected');
 

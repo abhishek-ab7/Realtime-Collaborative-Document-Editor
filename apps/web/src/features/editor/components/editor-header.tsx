@@ -9,22 +9,16 @@ import { updateDocument } from '@/features/documents/actions/document-actions';
 import { toast } from 'sonner';
 import { PresenceAvatars } from '@/features/collaboration/components/presence-avatars';
 import { TypingIndicator } from '@/features/collaboration/components/typing-indicator';
+import { SaveStatus } from '@/features/editor/components/save-status';
 
 interface EditorHeaderProps {
   documentId: string;
   title: string;
-  lastSavedAt?: Date | null;
-  isSaving?: boolean;
   wordCount?: number;
   characterCount?: number;
 }
 
-export function EditorHeader({
-  documentId,
-  title: initialTitle,
-  lastSavedAt,
-  isSaving = false,
-}: EditorHeaderProps) {
+export function EditorHeader({ documentId, title: initialTitle }: EditorHeaderProps) {
   const [title, setTitle] = useState(initialTitle);
   const [isEditing, setIsEditing] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -62,12 +56,6 @@ export function EditorHeader({
       setIsEditing(false);
     }
   };
-
-  const statusLabel = isSaving
-    ? 'Saving...'
-    : lastSavedAt
-      ? `Saved ${new Date(lastSavedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`
-      : '';
 
   return (
     <header className="sticky top-0 z-40 border-b border-[#e2e8f0] bg-white/95 backdrop-blur-sm">
@@ -107,11 +95,7 @@ export function EditorHeader({
             </button>
           )}
 
-          {statusLabel && (
-            <span className="shrink-0 text-xs text-[#94a3b8]" data-testid="save-status">
-              {statusLabel}
-            </span>
-          )}
+          <SaveStatus />
           <TypingIndicator />
         </div>
 
