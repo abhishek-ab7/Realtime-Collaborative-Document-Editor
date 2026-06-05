@@ -255,10 +255,10 @@ describe('Version API routes', () => {
         versionNum: 2,
       } as any);
 
-      vi.mocked(prisma.documentVersion.create).mockImplementation((args: any) => {
+      (vi.mocked(prisma.documentVersion.create) as any).mockImplementation((args: any) => {
         return Promise.resolve({
           id: mockVersionId,
-          ...args.data,
+          ...(args?.data || {}),
         });
       });
 
@@ -293,8 +293,8 @@ describe('Version API routes', () => {
       } as any);
 
       vi.mocked(prisma.documentVersion.findFirst).mockResolvedValue(null);
-      vi.mocked(prisma.documentVersion.create).mockImplementation((args: any) =>
-        Promise.resolve(args.data),
+      (vi.mocked(prisma.documentVersion.create) as any).mockImplementation((args: any) =>
+        Promise.resolve(args?.data),
       );
 
       const req = new NextRequest(`http://localhost/api/documents/${mockDocId}/versions`);
