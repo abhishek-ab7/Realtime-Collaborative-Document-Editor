@@ -2,6 +2,13 @@
 
 ## What was in progress & completed
 
+- Completed the **Codecov Integration (Coverage, Test, & Bundle Analysis)**:
+  - Configured `@codecov/nextjs-webpack-plugin` in `apps/web/next.config.ts`.
+  - Added JUnit test reporting and Vitest coverage output (`test-report.junit.xml`) for all workspaces.
+  - Set up `CODECOV_TOKEN` locally in `.env` and `apps/web/.env.local`.
+  - Included `CODECOV_TOKEN` environment variable dependency in `turbo.json` build task.
+  - Verified local build and test suite run cleanly.
+
 - Fully completed the **NextAuth to Supabase Auth Migration**:
   - Removed `next-auth` and `@auth/prisma-adapter`.
   - Installed and configured `@supabase/ssr` and `@supabase/supabase-js`.
