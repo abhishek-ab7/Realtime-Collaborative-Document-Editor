@@ -10,8 +10,8 @@ jobs:
   build-and-test:
     runs-on: ubuntu-latest
     env:
-      NEXT_PUBLIC_SUPABASE_URL: https://dummy-project.supabase.co
-      NEXT_PUBLIC_SUPABASE_ANON_KEY: dummy-anon-key-string-for-ci-build
+      NEXT_PUBLIC_SUPABASE_URL: https://trjloubazxygxfhxbtey.supabase.co
+      NEXT_PUBLIC_SUPABASE_ANON_KEY: sb_publishable_M8r81tkCGqXhkf4ma5KuyA_mUizXIQZ
 
     services:
       postgres:
