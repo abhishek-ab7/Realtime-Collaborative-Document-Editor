@@ -1,7 +1,10 @@
 'use client';
 
+import { useEffect } from 'react';
 import { Editor } from '@/features/editor/components/editor';
 import { EditorHeader } from '@/features/editor/components/editor-header';
+import { SaveStatus } from '@/features/editor/components/save-status';
+import { OfflineBanner } from '@/features/editor/components/offline-banner';
 import {
   CollaborationProvider,
   useCollaborationContext,
@@ -9,7 +12,6 @@ import {
 import { ConnectionStatus } from '@/features/collaboration/components/connection-status';
 import { usePresence } from '@/features/collaboration/hooks/use-presence';
 import { PRESENCE_COLORS } from '@collabdoc/shared';
-import { useEffect } from 'react';
 
 interface DocumentEditorClientProps {
   documentId: string;
@@ -34,30 +36,37 @@ function CollaborativeEditor({
   userImage: string | null;
   userId: string;
 }) {
-  const { doc, awareness, saveStatus } = useCollaborationContext();
+  const { doc, awareness, saveStatus, connectionStatus } = useCollaborationContext();
   const { setLocalUser } = usePresence();
 
-  // Deterministic color assignment based on userId
+  // Deterministic color from userId hash
   const colorIndex =
     userId.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0) % PRESENCE_COLORS.length;
   const userColor = PRESENCE_COLORS[colorIndex];
 
-  // Set local user details in the awareness state once connected
+  // Push local user info into awareness once connected
   useEffect(() => {
     if (awareness) {
-      setLocalUser({
-        userId,
-        name: userName,
-        avatarUrl: userImage,
-        color: userColor,
-      });
+      setLocalUser({ userId, name: userName, avatarUrl: userImage, color: userColor });
     }
   }, [awareness, userId, userName, userColor, userImage, setLocalUser]);
 
-  const isSaving = saveStatus === 'saving';
-  const lastSavedAt = saveStatus === 'saved' ? new Date() : null;
+  // Warn the browser before closing when there are unsaved changes
+  useEffect(() => {
+    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+      if (saveStatus === 'saving') {
+        e.preventDefault();
+        // Modern browsers ignore the returnValue string but still show the dialog
+        e.returnValue = '';
+      }
+    };
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    return () => window.removeEventListener('beforeunload', handleBeforeUnload);
+  }, [saveStatus]);
 
-  // Show loading state until synced
+  const isOffline = connectionStatus === 'disconnected';
+
+  // Loading state until socket sync
   if (!doc) {
     return (
       <div className="flex min-h-screen flex-col bg-white">
@@ -74,16 +83,17 @@ function CollaborativeEditor({
 
   return (
     <div className="flex min-h-screen flex-col bg-white">
-      <EditorHeader
-        documentId={documentId}
-        title={title}
-        lastSavedAt={lastSavedAt}
-        isSaving={isSaving}
-      />
-      {/* Connection status bar */}
-      <div className="flex items-center justify-end border-b border-[#f1f5f9] px-4 py-1">
+      <EditorHeader documentId={documentId} title={title} />
+
+      {/* Offline warning banner */}
+      {isOffline && <OfflineBanner />}
+
+      {/* Sub-header: connection status + save status */}
+      <div className="flex items-center justify-between border-b border-[#f1f5f9] px-4 py-1">
         <ConnectionStatus />
+        <SaveStatus />
       </div>
+
       <main className="flex-1">
         <div className="mx-auto max-w-5xl">
           <Editor

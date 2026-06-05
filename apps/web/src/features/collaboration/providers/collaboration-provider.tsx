@@ -11,7 +11,7 @@ import {
 } from 'react';
 import * as Y from 'yjs';
 import type { Awareness } from 'y-protocols/awareness';
-import { SocketIOProvider, type ConnectionStatus } from '@collabdoc/yjs-utils';
+import { SocketIOProvider, OfflinePersistence, type ConnectionStatus } from '@collabdoc/yjs-utils';
 import { generateSocketToken } from '@/features/auth/actions/generate-socket-token';
 import { toast } from 'sonner';
 
@@ -52,14 +52,14 @@ export function CollaborationProvider({ documentId, children }: CollaborationPro
     Array<{ userId: string; name: string; avatarUrl: string | null }>
   >([]);
 
-  // Use state instead of refs for values consumed during render
   const [doc, setDoc] = useState<Y.Doc | null>(null);
   const [provider, setProvider] = useState<SocketIOProvider | null>(null);
   const [awareness, setAwareness] = useState<Awareness | null>(null);
 
-  // Keep refs for cleanup only
+  // Refs for cleanup only (avoid stale closures in effects)
   const docRef = useRef<Y.Doc | null>(null);
   const providerRef = useRef<SocketIOProvider | null>(null);
+  const offlineRef = useRef<OfflinePersistence | null>(null);
 
   useEffect(() => {
     let mounted = true;
@@ -74,16 +74,24 @@ export function CollaborationProvider({ documentId, children }: CollaborationPro
       const newDoc = new Y.Doc();
       docRef.current = newDoc;
 
-      // 3. Create provider
+      // 3. Initialize IndexedDB offline persistence (load local state before network sync)
+      const offlinePersistence = new OfflinePersistence(documentId, newDoc);
+      offlineRef.current = offlinePersistence;
+      try {
+        await offlinePersistence.init();
+      } catch {
+        // Non-fatal — fall back to server-only sync
+      }
+
+      // 4. Create socket provider
       const socketUrl = process.env.NEXT_PUBLIC_SOCKET_URL || 'http://localhost:3001';
       localProvider = new SocketIOProvider(socketUrl, documentId, newDoc, {
         authToken: token,
         autoConnect: true,
       });
-
       providerRef.current = localProvider;
 
-      // 4. Listen for events
+      // 5. Listen for events
       localProvider.on('status', ([status]: [ConnectionStatus]) => {
         if (mounted) setConnectionStatus(status);
       });
@@ -108,7 +116,6 @@ export function CollaborationProvider({ documentId, children }: CollaborationPro
         ([user]: [{ userId: string; name: string; avatarUrl: string | null }]) => {
           if (mounted) {
             setConnectedUsers((prev) => {
-              // Avoid duplicates
               if (prev.some((u) => u.userId === user.userId)) return prev;
               toast.info(`${user.name} joined`);
               return [...prev, user];
@@ -124,7 +131,7 @@ export function CollaborationProvider({ documentId, children }: CollaborationPro
         }
       });
 
-      // Update state for render consumption
+      // Update render state
       if (mounted) {
         setDoc(newDoc);
         setProvider(localProvider);
@@ -137,12 +144,14 @@ export function CollaborationProvider({ documentId, children }: CollaborationPro
     return () => {
       mounted = false;
       providerRef.current?.destroy();
+      offlineRef.current?.destroy();
       docRef.current?.destroy();
       setDoc(null);
       setProvider(null);
       setAwareness(null);
       docRef.current = null;
       providerRef.current = null;
+      offlineRef.current = null;
     };
   }, [documentId]);
 
