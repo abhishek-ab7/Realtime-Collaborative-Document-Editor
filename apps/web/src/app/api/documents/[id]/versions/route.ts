@@ -1,17 +1,17 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@collabdoc/database';
-import { auth } from '@/features/auth/lib/auth';
+import { auth } from '@/lib/auth';
 import * as Y from 'yjs';
 import { extractPlainText, countWords } from '@collabdoc/shared';
 
-export async function GET(request: NextRequest, { params }: { params: { id: string } }) {
+export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const session = await auth();
     if (!session?.user?.id) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const documentId = params.id;
+    const documentId = (await params).id;
 
     // Verify user has access to this document
     const document = await prisma.document.findUnique({
@@ -60,14 +60,14 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
 
 // POST for creating a manual version is handled via the socket server or HTTP?
 // We can do it via HTTP by fetching current snapshot and creating a version.
-export async function POST(request: NextRequest, { params }: { params: { id: string } }) {
+export async function POST(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const session = await auth();
     if (!session?.user?.id) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const documentId = params.id;
+    const documentId = (await params).id;
 
     // Verify user has EDITOR access (only editors can create manual versions)
     const document = await prisma.document.findUnique({

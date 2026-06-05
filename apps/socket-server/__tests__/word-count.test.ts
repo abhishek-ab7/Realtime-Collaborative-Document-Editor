@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import * as Y from 'yjs';
-import { extractPlainText, countWords } from '../s@collabdoc/shared';
+import { extractPlainText, countWords } from '@collabdoc/shared';
 
 describe('Text Utilities', () => {
   describe('extractPlainText', () => {

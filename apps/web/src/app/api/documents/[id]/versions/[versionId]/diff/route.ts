@@ -1,12 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@collabdoc/database';
-import { auth } from '@/features/auth/lib/auth';
+import { auth } from '@/lib/auth';
 import * as Y from 'yjs';
 import { extractPlainText, computeDiff } from '@collabdoc/shared';
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string; versionId: string } },
+  { params }: { params: Promise<{ id: string; versionId: string }> },
 ) {
   try {
     const session = await auth();
@@ -14,7 +14,7 @@ export async function GET(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const documentId = params.id;
+    const { id: documentId, versionId } = await params;
 
     // Verify access
     const document = await prisma.document.findUnique({
@@ -35,7 +35,7 @@ export async function GET(
     }
 
     const version = await prisma.documentVersion.findUnique({
-      where: { id: params.versionId },
+      where: { id: versionId },
     });
 
     if (!version || version.documentId !== documentId) {

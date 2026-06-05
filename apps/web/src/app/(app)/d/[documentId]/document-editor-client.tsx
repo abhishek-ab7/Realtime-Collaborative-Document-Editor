@@ -125,6 +125,7 @@ function CollaborativeEditor({
         </div>
 
         <VersionPanel
+          documentId={documentId}
           isOpen={versionsHook.isOpen}
           onClose={() => versionsHook.setIsOpen(false)}
           versions={versionsHook.versions}
