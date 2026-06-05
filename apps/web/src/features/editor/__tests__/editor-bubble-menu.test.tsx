@@ -25,7 +25,7 @@ vi.mock('react-dom', async (importOriginal) => {
   return {
     ...actual,
 
-    createPortal: (children: React.ReactNode, _container: Element) => children,
+    createPortal: (children: React.ReactNode) => children,
   };
 });
 
