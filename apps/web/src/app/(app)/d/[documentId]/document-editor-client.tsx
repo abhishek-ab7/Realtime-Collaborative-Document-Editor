@@ -9,11 +9,12 @@ import {
   useCollaborationContext,
 } from '@/features/collaboration/providers/collaboration-provider';
 import { usePresence } from '@/features/collaboration/hooks/use-presence';
-import { PRESENCE_COLORS } from '@collabdoc/shared';
+import { PRESENCE_COLORS, canEditDocument } from '@collabdoc/shared';
 import { useVersions, VersionItem } from '@/features/editor/hooks/use-versions';
 import { VersionPanel } from '@/features/editor/components/version-history/version-panel';
 import { VersionDiffViewer } from '@/features/editor/components/version-history/version-diff';
 import { useState } from 'react';
+import type { DocumentRole } from '@/lib/permissions';
 
 interface DocumentEditorClientProps {
   documentId: string;
@@ -23,6 +24,7 @@ interface DocumentEditorClientProps {
   userName: string;
   userImage: string | null;
   userId: string;
+  role: DocumentRole;
 }
 
 function CollaborativeEditor({
@@ -31,12 +33,14 @@ function CollaborativeEditor({
   userName,
   userImage,
   userId,
+  role,
 }: {
   documentId: string;
   title: string;
   userName: string;
   userImage: string | null;
   userId: string;
+  role: DocumentRole;
 }) {
   const { doc, awareness, saveStatus, connectionStatus } = useCollaborationContext();
   const { setLocalUser } = usePresence();
@@ -44,6 +48,8 @@ function CollaborativeEditor({
   const colorIndex =
     userId.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0) % PRESENCE_COLORS.length;
   const userColor = PRESENCE_COLORS[colorIndex];
+
+  const editable = canEditDocument(role);
 
   // Versions State
   const versionsHook = useVersions(documentId);
@@ -84,7 +90,7 @@ function CollaborativeEditor({
   if (!doc) {
     return (
       <div className="flex min-h-screen flex-col bg-white">
-        <EditorHeader documentId={documentId} title={title} />
+        <EditorHeader documentId={documentId} title={title} role={role} />
         <main className="flex flex-1 items-center justify-center">
           <div className="flex flex-col items-center gap-3">
             <div className="h-8 w-8 animate-spin rounded-full border-2 border-[#e2e8f0] border-t-[#6366f1]" />
@@ -101,15 +107,25 @@ function CollaborativeEditor({
         documentId={documentId}
         title={title}
         onOpenHistory={versionsHook.togglePanel}
+        role={role}
       />
 
       {/* Offline warning banner */}
       {isOffline && <OfflineBanner />}
 
+      {/* View-only banner for viewers */}
+      {!editable && (
+        <div className="flex items-center justify-center border-b border-[#fef3c7] bg-[#fffbeb] px-4 py-2">
+          <p className="text-xs font-medium text-[#d97706]">
+            🔒 You have view-only access to this document
+          </p>
+        </div>
+      )}
+
       <main className="relative flex flex-1 overflow-hidden">
         <div className="mx-auto flex h-full w-full max-w-5xl flex-1 flex-col">
           <Editor
-            editable={true}
+            editable={editable}
             yjsDoc={doc}
             awareness={awareness ?? undefined}
             user={{ name: userName, color: userColor }}
@@ -143,6 +159,7 @@ export function DocumentEditorClient({
   userName,
   userImage,
   userId,
+  role,
 }: DocumentEditorClientProps) {
   return (
     <CollaborationProvider documentId={documentId}>
@@ -152,6 +169,7 @@ export function DocumentEditorClient({
         userName={userName}
         userImage={userImage}
         userId={userId}
+        role={role}
       />
     </CollaborationProvider>
   );

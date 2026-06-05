@@ -2,6 +2,7 @@ import { notFound, redirect } from 'next/navigation';
 import { auth } from '@/lib/auth';
 import { prisma } from '@collabdoc/database';
 import { DocumentEditorClient } from './document-editor-client';
+import { getDocumentRole } from '@/lib/permissions';
 
 interface EditorPageProps {
   params: Promise<{ documentId: string }>;
@@ -14,20 +15,16 @@ export default async function EditorPage({ params }: EditorPageProps) {
 
   const { documentId } = await params;
 
-  // Fetch document and verify access
+  // Fetch document
   const document = await prisma.document.findUnique({
     where: { id: documentId },
-    include: {
-      collaborators: { select: { userId: true } },
-    },
   });
 
   if (!document) notFound();
 
-  const isOwner = document.ownerId === userId;
-  const isCollaborator = document.collaborators.some((c) => c.userId === userId);
-
-  if (!isOwner && !isCollaborator) notFound();
+  // Resolve user's role via centralized permission system
+  const role = await getDocumentRole(documentId, userId);
+  if (!role) notFound();
 
   if (document.status === 'TRASHED') redirect('/trash');
 
@@ -50,6 +47,7 @@ export default async function EditorPage({ params }: EditorPageProps) {
       userName={session.user.name || 'Anonymous'}
       userImage={session.user.image || null}
       userId={userId}
+      role={role}
     />
   );
 }
