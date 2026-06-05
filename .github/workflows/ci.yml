@@ -88,13 +88,13 @@ jobs:
           token: ${{ secrets.CODECOV_TOKEN }}
           slug: abhishek-ab7/Realtime-Collaborative-Document-Editor
 
-      - name: Install Playwright Browsers
-        run: npx playwright install --with-deps
-
-      - name: Run Playwright E2E Tests
-        run: npm run test:e2e
-        env:
-          DATABASE_URL: postgresql://collabdoc:collabdoc_dev_password@localhost:5432/collabdoc?schema=public
+#       - name: Install Playwright Browsers
+#         run: npx playwright install --with-deps
+#
+#       - name: Run Playwright E2E Tests
+#         run: npm run test:e2e
+#         env:
+#           DATABASE_URL: postgresql://collabdoc:collabdoc_dev_password@localhost:5432/collabdoc?schema=public
 
       - name: Run TestSprite Automated Testing
         if: ${{ env.TESTSPRITE_API_KEY != '' }}

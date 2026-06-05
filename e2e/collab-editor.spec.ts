@@ -8,6 +8,10 @@ test.describe('Collabdoc - E2E Integration Suite', () => {
     page,
     browser,
   }) => {
+    // Register console and page error listeners
+    page.on('console', (msg) => console.log(`[BROWSER LOG] [${msg.type()}] ${msg.text()}`));
+    page.on('pageerror', (err) => console.error(`[BROWSER ERROR] ${err.message}\n${err.stack}`));
+
     // 1. Authenticate and reach Dashboard
     await page.goto('/signin');
     await page.fill('input[type="email"]', testUserEmail);
