@@ -1,7 +1,7 @@
 'use client';
 
 import { useEditor as useTipTapEditor } from '@tiptap/react';
-import { useRef, useEffect } from 'react';
+import { useRef, useEffect, useMemo } from 'react';
 import { getEditorExtensions } from '../lib/extensions';
 import type * as Y from 'yjs';
 import type { Awareness } from 'y-protocols/awareness';
@@ -29,12 +29,17 @@ export function useDocumentEditor({
   const isCollaborative = !!yjsDoc;
   const typingTimerRef = useRef<NodeJS.Timeout | null>(null);
 
-  const editor = useTipTapEditor({
-    extensions: getEditorExtensions({
+  const userSerialized = user ? `${user.name}:${user.color}` : '';
+  const extensions = useMemo(() => {
+    return getEditorExtensions({
       yjsDoc,
       awareness,
       user,
-    }),
+    });
+  }, [yjsDoc, awareness, userSerialized]);
+
+  const editor = useTipTapEditor({
+    extensions,
     // In collaborative mode, content comes from Y.Doc — don't set initial HTML
     ...(isCollaborative ? {} : { content }),
     editable,

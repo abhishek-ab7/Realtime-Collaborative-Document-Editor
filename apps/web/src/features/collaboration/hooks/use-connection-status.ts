@@ -22,7 +22,6 @@ export function useConnectionStatus() {
 }
 
 function getStatusLabel(status: ConnectionStatus, synced: boolean, saveStatus: string): string {
-  if (saveStatus === 'saving') return 'Saving...';
   switch (status) {
     case 'disconnected':
       return 'Offline';
@@ -33,7 +32,7 @@ function getStatusLabel(status: ConnectionStatus, synced: boolean, saveStatus: s
     case 'syncing':
       return 'Syncing...';
     case 'synced':
-      return synced ? 'All changes saved' : 'Connected';
+      return 'Connected';
     default:
       return 'Unknown';
   }

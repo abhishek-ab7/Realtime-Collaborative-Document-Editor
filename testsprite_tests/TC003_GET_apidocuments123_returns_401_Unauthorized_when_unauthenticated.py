@@ -1,17 +1,16 @@
 import requests
 
 BASE_URL = "http://localhost:3000"
-TIMEOUT = 30
+
 
 def test_get_document_123_unauthenticated_returns_401():
     url = f"{BASE_URL}/api/documents/123"
     try:
-        response = requests.get(url, timeout=TIMEOUT)
+        response = requests.get(url, timeout=30)
     except requests.RequestException as e:
         assert False, f"Request failed: {e}"
 
-    assert response.status_code == 401, f"Expected status 401 but got {response.status_code}"
-    # Optionally check for presence of unauthorized error in response body if applicable:
-    # assert "unauthorized" in response.text.lower()
+    assert response.status_code == 401, f"Expected 401 Unauthorized but got {response.status_code}"
+
 
 test_get_document_123_unauthenticated_returns_401()

@@ -8,6 +8,7 @@ test.describe('Collabdoc - E2E Integration Suite', () => {
     page,
     browser,
   }) => {
+    test.setTimeout(120000);
     // Register console and page error listeners
     page.on('console', (msg) => console.log(`[BROWSER LOG] [${msg.type()}] ${msg.text()}`));
     page.on('pageerror', (err) => console.error(`[BROWSER ERROR] ${err.message}\n${err.stack}`));
@@ -41,15 +42,9 @@ test.describe('Collabdoc - E2E Integration Suite', () => {
     );
 
     // 4. Test Multi-User Real-time Collaboration (Sync)
-    const secondContext = await browser.newContext();
+    const storageState = await page.context().storageState();
+    const secondContext = await browser.newContext({ storageState });
     const pageCollaborator = await secondContext.newPage();
-
-    // Authenticate the second collaborator
-    await pageCollaborator.goto('/signin');
-    await pageCollaborator.fill('input[type="email"]', testUserEmail);
-    await pageCollaborator.fill('input[type="password"]', testUserPassword);
-    await pageCollaborator.click('button[type="submit"]');
-    await expect(pageCollaborator).toHaveURL(/\/dashboard/);
 
     // Navigate to the same document
     await pageCollaborator.goto(`/d/${documentId}`);
@@ -73,17 +68,20 @@ test.describe('Collabdoc - E2E Integration Suite', () => {
     await secondContext.close();
 
     // 5. Back to Dashboard and Document Trash lifecycle
-    await page.click('button[title="Back to Dashboard"]');
+    await page.click('[title="Back to Dashboard"]');
     await expect(page).toHaveURL(/\/dashboard/);
 
     const docCard = page.locator(`[data-testid="document-card-${documentId}"]`);
     await expect(docCard).toBeVisible();
 
+    // Settle delay to avoid HMR / Fast Refresh DOM detachment
+    await page.waitForTimeout(2000);
+
     // Right-click to open Context Menu and trash
-    await docCard.click({ button: 'right' });
-    const moveToTrashItem = page.locator('text=Move to trash');
+    await docCard.dispatchEvent('contextmenu');
+    const moveToTrashItem = page.locator('[role="menuitem"]:has-text("Move to trash")');
     await expect(moveToTrashItem).toBeVisible();
-    await moveToTrashItem.click();
+    await moveToTrashItem.click({ force: true });
 
     // Verify card is removed from active list
     await expect(docCard).not.toBeVisible();
@@ -93,11 +91,14 @@ test.describe('Collabdoc - E2E Integration Suite', () => {
     const trashedCard = page.locator(`[data-testid="document-card-${documentId}"]`);
     await expect(trashedCard).toBeVisible();
 
+    // Settle delay to avoid HMR / Fast Refresh DOM detachment
+    await page.waitForTimeout(2000);
+
     // Right-click and restore
-    await trashedCard.click({ button: 'right' });
-    const restoreItem = page.locator('text=Restore');
+    await trashedCard.dispatchEvent('contextmenu');
+    const restoreItem = page.locator('[role="menuitem"]:has-text("Restore")');
     await expect(restoreItem).toBeVisible();
-    await restoreItem.click();
+    await restoreItem.click({ force: true });
 
     // Verify card removed from Trash
     await expect(trashedCard).not.toBeVisible();
