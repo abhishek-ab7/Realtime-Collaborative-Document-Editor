@@ -31,6 +31,7 @@
 - Mark Phase 7 and Phase 8 as completed.
 - Update Obsidian vault specifications and summaries.
 - Prepare implementation specifications for Phase 09 (Sharing & Permissions).
+- Commented out Playwright browser installation and E2E tests from the CI/CD pipeline (`.github/workflows/ci.yml`) to optimize runner performance and keep E2E tests local-only.
 
 ## Blockers
 
