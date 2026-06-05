@@ -102,6 +102,29 @@ jobs:
           API_KEY: ${{ secrets.TESTSPRITE_API_KEY }}
           DATABASE_URL: postgresql://collabdoc:collabdoc_dev_password@localhost:5432/collabdoc?schema=public
         run: |
+          mkdir -p testsprite_tests/tmp
+          cat <<EOF > testsprite_tests/tmp/config.json
+          {
+            "status": "commited",
+            "type": "backend",
+            "scope": "codebase",
+            "localEndpoint": "http://localhost:3000",
+            "backendAuthType": "public",
+            "loginUser": "testsprite@example.com",
+            "loginPassword": "TestPassword123!",
+            "executionArgs": {
+              "projectName": "Realtime Collaborative Document Editor",
+              "projectPath": "$GITHUB_WORKSPACE",
+              "testIds": [],
+              "additionalInstruction": "",
+              "serverMode": "development",
+              "envs": {
+                "API_KEY": "$API_KEY"
+              }
+            },
+            "serverPort": 45587
+          }
+          EOF
           npm run dev &
           echo "Waiting for localhost:3000 to be active..."
           for i in {1..30}; do

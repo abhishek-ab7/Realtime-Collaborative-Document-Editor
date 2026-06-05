@@ -11,7 +11,7 @@ import TaskItem from '@tiptap/extension-task-item';
 import CodeBlockLowlight from '@tiptap/extension-code-block-lowlight';
 import HorizontalRule from '@tiptap/extension-horizontal-rule';
 import Collaboration from '@tiptap/extension-collaboration';
-import CollaborationCursor from '@tiptap/extension-collaboration-cursor';
+import CollaborationCaret from '@tiptap/extension-collaboration-caret';
 import { common, createLowlight } from 'lowlight';
 import type * as Y from 'yjs';
 import type { Awareness } from 'y-protocols/awareness';
@@ -82,7 +82,7 @@ export function getEditorExtensions(options?: ExtensionOptions) {
 
     if (options?.awareness && options?.user) {
       extensions.push(
-        CollaborationCursor.configure({
+        CollaborationCaret.configure({
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           provider: { awareness: options.awareness } as any,
           user: options.user,
