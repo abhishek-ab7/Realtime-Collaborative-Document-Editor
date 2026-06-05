@@ -1,5 +1,7 @@
 import { test, expect } from '@playwright/test';
 
+test.use({ storageState: 'playwright/.auth/user.json' });
+
 test.describe('Real-time Collaboration E2E', () => {
   test('verifies document updates sync between two editor contexts', async ({ page, browser }) => {
     test.setTimeout(90000);

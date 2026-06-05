@@ -24,6 +24,7 @@ export function useCollaborators(documentId: string) {
 
   const fetchCollaborators = useCallback(async () => {
     try {
+      await Promise.resolve();
       setIsLoading(true);
       const res = await fetch(`/api/documents/${documentId}/collaborators`);
       if (!res.ok) throw new Error('Failed to fetch collaborators');

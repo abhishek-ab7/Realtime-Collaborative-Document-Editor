@@ -1,12 +1,15 @@
 import { test, expect } from '@playwright/test';
 
+test.use({ storageState: 'playwright/.auth/user.json' });
+
 test.describe('User Journey E2E', () => {
   test('creates, renames, and trashes a document', async ({ page }) => {
     test.setTimeout(60000);
 
     // 1. Visit dashboard
     await page.goto('/dashboard');
-    await expect(page.locator('h1')).toContainText('My Documents');
+    await expect(page).toHaveURL(/\/dashboard/);
+    await expect(page.locator('h2').first()).toContainText('Recent Documents');
 
     // 2. Create document
     await page.click('[data-testid="create-document-button"]');

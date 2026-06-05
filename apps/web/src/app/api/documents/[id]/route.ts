@@ -1,12 +1,10 @@
-import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@collabdoc/database';
 import { updateDocumentSchema } from '@collabdoc/shared';
 import { canDeleteDocument, canRenameDocument, canEditDocument } from '@collabdoc/shared';
-import { getDocumentRole, withPermission } from '@/lib/permissions';
-import { auth } from '@/lib/auth';
+import { withPermission } from '@/lib/permissions';
 
 // GET /api/documents/[id] — Retrieve a single document (requires VIEWER)
-export const GET = withPermission('VIEWER', async (_request, { params, userId, role }) => {
+export const GET = withPermission('VIEWER', async (_request, { params, role }) => {
   const document = await prisma.document.findUnique({
     where: { id: params.id },
     include: {
@@ -91,7 +89,7 @@ export const PATCH = withPermission('VIEWER', async (request, { params, userId, 
 });
 
 // DELETE /api/documents/[id] — Permanently delete a document (requires OWNER)
-export const DELETE = withPermission('OWNER', async (_request, { params, userId }) => {
+export const DELETE = withPermission('OWNER', async (_request, { params }) => {
   const doc = await prisma.document.findUnique({ where: { id: params.id } });
   if (!doc) {
     return Response.json({ error: 'Document not found' }, { status: 404 });

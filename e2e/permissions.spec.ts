@@ -1,5 +1,7 @@
 import { test, expect } from '@playwright/test';
 
+test.use({ storageState: 'playwright/.auth/user.json' });
+
 test.describe('E2E Permissions Enforcement', () => {
   test('enforces read-only mode for viewer', async ({ page, browser }) => {
     test.setTimeout(90000);

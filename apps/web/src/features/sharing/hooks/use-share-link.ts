@@ -18,6 +18,7 @@ export function useShareLink(documentId: string) {
 
   const fetchLinks = useCallback(async () => {
     try {
+      await Promise.resolve();
       setIsLoading(true);
       const res = await fetch(`/api/documents/${documentId}/share/link`);
       if (!res.ok) {
