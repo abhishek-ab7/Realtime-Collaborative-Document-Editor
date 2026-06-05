@@ -92,28 +92,28 @@ export function CollaborationProvider({ documentId, children }: CollaborationPro
       providerRef.current = localProvider;
 
       // 5. Listen for events
-      localProvider.on('status', ([status]: [ConnectionStatus]) => {
+      localProvider.on('status', (status: ConnectionStatus) => {
         if (mounted) setConnectionStatus(status);
       });
 
-      localProvider.on('sync', ([synced]: [boolean]) => {
+      localProvider.on('sync', (synced: boolean) => {
         if (mounted) setIsSynced(synced);
       });
 
-      localProvider.on('save-status', ([status]: [string]) => {
+      localProvider.on('save-status', (status: string) => {
         if (mounted) setSaveStatus(status as 'saving' | 'saved' | 'error');
       });
 
       localProvider.on(
         'users',
-        ([users]: [Array<{ userId: string; name: string; avatarUrl: string | null }>]) => {
+        (users: Array<{ userId: string; name: string; avatarUrl: string | null }>) => {
           if (mounted) setConnectedUsers(users);
         },
       );
 
       localProvider.on(
         'user-joined',
-        ([user]: [{ userId: string; name: string; avatarUrl: string | null }]) => {
+        (user: { userId: string; name: string; avatarUrl: string | null }) => {
           if (mounted) {
             setConnectedUsers((prev) => {
               if (prev.some((u) => u.userId === user.userId)) return prev;
@@ -124,7 +124,7 @@ export function CollaborationProvider({ documentId, children }: CollaborationPro
         },
       );
 
-      localProvider.on('user-left', ([user]: [{ userId: string; name: string }]) => {
+      localProvider.on('user-left', (user: { userId: string; name: string }) => {
         if (mounted) {
           toast.info(`${user.name} left`);
           setConnectedUsers((prev) => prev.filter((u) => u.userId !== user.userId));
