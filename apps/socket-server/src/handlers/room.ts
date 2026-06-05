@@ -4,6 +4,7 @@ import { roomManager } from '../rooms/room-manager';
 import { prisma } from '@collabdoc/database';
 import { canViewDocument } from '@collabdoc/shared';
 import { logger } from '../lib/logger';
+import { cleanupAwarenessThrottle } from './awareness';
 
 export function registerRoomHandlers(io: Server, socket: Socket) {
   const authSocket = socket as AuthenticatedSocket;
@@ -120,6 +121,7 @@ export function handleLeaveRoom(_io: Server, socket: Socket, documentId: string)
   if (room) {
     const user = room.removeUser(socket.id);
     socket.leave(documentId);
+    cleanupAwarenessThrottle(documentId, socket.id);
 
     // Notify others
     if (user) {

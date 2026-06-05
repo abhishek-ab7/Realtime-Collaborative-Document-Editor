@@ -65,7 +65,7 @@ describe('Editor', () => {
     const onUpdate = vi.fn();
     vi.mocked(useDocumentEditor).mockImplementation(({ onUpdate } = {}) => {
       // Simulate calling onUpdate
-      if (onUpdate) onUpdate();
+      if (onUpdate) onUpdate('<p>Mock Content</p>');
       return null as any;
     });
 

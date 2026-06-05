@@ -5,7 +5,6 @@ import {
   updateDocument,
   deleteDocument,
   duplicateDocument,
-  duplicateDocument,
 } from '../actions/document-actions';
 
 vi.mock('@/lib/auth', () => {

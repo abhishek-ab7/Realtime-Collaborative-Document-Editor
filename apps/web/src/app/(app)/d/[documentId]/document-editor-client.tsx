@@ -7,7 +7,9 @@ import {
   useCollaborationContext,
 } from '@/features/collaboration/providers/collaboration-provider';
 import { ConnectionStatus } from '@/features/collaboration/components/connection-status';
+import { usePresence } from '@/features/collaboration/hooks/use-presence';
 import { PRESENCE_COLORS } from '@collabdoc/shared';
+import { useEffect } from 'react';
 
 interface DocumentEditorClientProps {
   documentId: string;
@@ -15,6 +17,7 @@ interface DocumentEditorClientProps {
   content: string;
   lastAccessedAt: Date | null;
   userName: string;
+  userImage: string | null;
   userId: string;
 }
 
@@ -22,19 +25,34 @@ function CollaborativeEditor({
   documentId,
   title,
   userName,
+  userImage,
   userId,
 }: {
   documentId: string;
   title: string;
   userName: string;
+  userImage: string | null;
   userId: string;
 }) {
   const { doc, awareness, saveStatus } = useCollaborationContext();
+  const { setLocalUser } = usePresence();
 
   // Deterministic color assignment based on userId
   const colorIndex =
     userId.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0) % PRESENCE_COLORS.length;
   const userColor = PRESENCE_COLORS[colorIndex];
+
+  // Set local user details in the awareness state once connected
+  useEffect(() => {
+    if (awareness) {
+      setLocalUser({
+        userId,
+        name: userName,
+        avatarUrl: userImage,
+        color: userColor,
+      });
+    }
+  }, [awareness, userId, userName, userColor, userImage, setLocalUser]);
 
   const isSaving = saveStatus === 'saving';
   const lastSavedAt = saveStatus === 'saved' ? new Date() : null;
@@ -84,6 +102,7 @@ export function DocumentEditorClient({
   documentId,
   title,
   userName,
+  userImage,
   userId,
 }: DocumentEditorClientProps) {
   return (
@@ -92,6 +111,7 @@ export function DocumentEditorClient({
         documentId={documentId}
         title={title}
         userName={userName}
+        userImage={userImage}
         userId={userId}
       />
     </CollaborationProvider>

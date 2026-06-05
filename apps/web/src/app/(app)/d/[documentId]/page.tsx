@@ -48,6 +48,7 @@ export default async function EditorPage({ params }: EditorPageProps) {
       content=""
       lastAccessedAt={document.lastAccessedAt}
       userName={session.user.name || 'Anonymous'}
+      userImage={session.user.image || null}
       userId={userId}
     />
   );

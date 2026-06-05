@@ -2,14 +2,22 @@
 
 ## What was in progress & completed
 
-- Completed the **Codecov Integration (Coverage, Test, & Bundle Analysis)**:
+- **Phase 06 — Live Presence & Cursors**:
+  - Implemented 30 Hz trailing-edge throttling for server awareness events in `apps/socket-server/src/handlers/awareness.ts` and room departure cleanup in `apps/socket-server/src/handlers/room.ts`.
+  - Built custom client-side presence logic using `usePresence` hook in `apps/web/src/features/collaboration/hooks/use-presence.ts`.
+  - Designed TipTap document activity tracking for debounced `isTyping` awareness state in `apps/web/src/features/editor/hooks/use-editor.ts`.
+  - Implemented client UI stacked avatars (`PresenceAvatars`), animated typing dots (`TypingIndicator`), room join/leave toast signals, and CSS transitions.
+  - Fully verified using a multi-package testing suite (17 tests in `socket-server` + 55 tests in `web` passing cleanly), zero ESLint warnings/errors, and successful Next.js production builds.
+  - Created Phase 06 final completion notes.
+
+- **Codecov Integration (Coverage, Test, & Bundle Analysis)**:
   - Configured `@codecov/nextjs-webpack-plugin` in `apps/web/next.config.ts`.
   - Added JUnit test reporting and Vitest coverage output (`test-report.junit.xml`) for all workspaces.
   - Set up `CODECOV_TOKEN` locally in `.env` and `apps/web/.env.local`.
   - Included `CODECOV_TOKEN` environment variable dependency in `turbo.json` build task.
   - Verified local build and test suite run cleanly.
 
-- Fully completed the **NextAuth to Supabase Auth Migration**:
+- **NextAuth to Supabase Auth Migration**:
   - Removed `next-auth` and `@auth/prisma-adapter`.
   - Installed and configured `@supabase/ssr` and `@supabase/supabase-js`.
   - Added custom client, server, and middleware session helpers.
@@ -18,20 +26,18 @@
   - Ported dynamic middleware redirects for `/dashboard`, `/d/*`, `/settings`, and `/trash`.
   - Verified user signup/signin and auto-redirection/document creation with automated tests.
   - Cleaned zombie Next.js dev server processes and set `NEXT_PUBLIC_SUPABASE_URL` to `trjloubazxygxfhxbtey`.
-  - All 45 unit/integration tests successfully passed.
+  - All unit/integration tests successfully passed.
 
 ## Today's Focus
 
-- Start **Phase 05 — Realtime Collaboration Engine**:
-  - Step 1: Scaffold Socket.io server connection handlers and authorization middleware (`apps/socket-server/src/index.ts`).
-  - Step 2: Set up rooms state and disconnect cleanup queues (`apps/socket-server/src/rooms/room-manager.ts`).
-  - Step 3: Implement binary sync event handshakes (`apps/socket-server/src/handlers/sync.ts`).
+- Complete and verify Phase 05 & Phase 06 features.
+- Prep codebase for Phase 07 (Persistence & Offline Support).
 
 ## Blockers
 
-- None. (Google OAuth needs redirect URI configuration on Google Cloud Console for the project reference `trjloubazxygxfhxbtey`, but email/password login is fully working).
+- None.
 
 **Related Links:**
 
-- [[02-phases/phase-05-realtime|Phase 05: Realtime Specification]]
-- [[04-architecture/socket-io-flow|WebSocket Sync Flow]]
+- [[02-phases/phase-06-presence|Phase 06: Presence Specification]]
+- [[02-phases/phase-06-COMPLETE|Phase 06: Completion Notes]]

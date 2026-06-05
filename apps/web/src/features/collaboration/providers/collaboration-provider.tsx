@@ -13,6 +13,7 @@ import * as Y from 'yjs';
 import type { Awareness } from 'y-protocols/awareness';
 import { SocketIOProvider, type ConnectionStatus } from '@collabdoc/yjs-utils';
 import { generateSocketToken } from '@/features/auth/actions/generate-socket-token';
+import { toast } from 'sonner';
 
 interface CollaborationContextValue {
   doc: Y.Doc | null;
@@ -109,6 +110,7 @@ export function CollaborationProvider({ documentId, children }: CollaborationPro
             setConnectedUsers((prev) => {
               // Avoid duplicates
               if (prev.some((u) => u.userId === user.userId)) return prev;
+              toast.info(`${user.name} joined`);
               return [...prev, user];
             });
           }
@@ -117,6 +119,7 @@ export function CollaborationProvider({ documentId, children }: CollaborationPro
 
       localProvider.on('user-left', ([user]: [{ userId: string; name: string }]) => {
         if (mounted) {
+          toast.info(`${user.name} left`);
           setConnectedUsers((prev) => prev.filter((u) => u.userId !== user.userId));
         }
       });
