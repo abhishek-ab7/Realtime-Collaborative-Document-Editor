@@ -23,7 +23,7 @@ export async function GET(request: NextRequest) {
 
     const input = listDocumentsSchema.parse(paramsObj);
 
-    const where: any = {
+    const where: Record<string, unknown> = {
       OR: [{ ownerId: userId }, { collaborators: { some: { userId } } }],
       status: input.status,
     };

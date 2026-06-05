@@ -39,6 +39,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html
       lang="en"
       className={cn(inter.variable, jetbrainsMono.variable, 'font-sans', geist.variable)}
+      suppressHydrationWarning
     >
       <body className="min-h-screen bg-[var(--color-bg-primary)] antialiased">
         <SessionProvider>{children}</SessionProvider>

@@ -1,6 +1,6 @@
 'use client';
 
-import { useSession as useNextAuthSession } from 'next-auth/react';
+import { useAuth } from '@/components/providers/session-provider';
 
 export interface TypedUser {
   id: string;
@@ -10,12 +10,19 @@ export interface TypedUser {
 }
 
 export function useTypedSession() {
-  const session = useNextAuthSession();
+  const { user, session, isLoading } = useAuth();
 
   return {
-    ...session,
-    user: session.data?.user as TypedUser | undefined,
-    isAuthenticated: session.status === 'authenticated',
-    isLoading: session.status === 'loading',
+    data: session,
+    user: user
+      ? ({
+          id: user.id,
+          name: user.user_metadata?.full_name || '',
+          email: user.email || '',
+          image: user.user_metadata?.avatar_url || null,
+        } as TypedUser)
+      : undefined,
+    isAuthenticated: !!session,
+    isLoading,
   };
 }

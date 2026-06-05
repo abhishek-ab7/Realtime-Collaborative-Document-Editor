@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { render, screen, fireEvent, act } from '@testing-library/react';
 import { describe, test, expect, vi } from 'vitest';
 import { CreateDocumentButton } from '../components/create-document-button';

@@ -1,0 +1,6 @@
+# Obsidian local settings
+.obsidian/
+.DS_Store
+*.swp
+*.swo
+*~

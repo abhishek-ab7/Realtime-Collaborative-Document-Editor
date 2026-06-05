@@ -12,7 +12,8 @@
     "db:studio": "prisma studio",
     "type-check": "tsc --noEmit",
     "build": "echo 'No build needed'",
-    "test": "vitest run"
+    "test": "vitest run",
+    "test:coverage": "vitest run --coverage --reporter=default --reporter=junit --outputFile.junit=test-report.junit.xml"
   },
   "dependencies": {
     "@prisma/client": "^6.0.0"

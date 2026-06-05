@@ -47,7 +47,7 @@ export function DocumentCard({
   let timeAgo = '';
   try {
     timeAgo = formatDistanceToNow(formattedDate, { addSuffix: true });
-  } catch (e) {
+  } catch {
     timeAgo = 'recently';
   }
 

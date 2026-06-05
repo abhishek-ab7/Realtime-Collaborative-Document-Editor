@@ -2,13 +2,16 @@ name: CI
 
 on:
   push:
-    branches: [main]
+    branches: [main, phase-05-complete]
   pull_request:
     branches: [main]
 
 jobs:
   build-and-test:
     runs-on: ubuntu-latest
+    env:
+      NEXT_PUBLIC_SUPABASE_URL: https://trjloubazxygxfhxbtey.supabase.co
+      NEXT_PUBLIC_SUPABASE_ANON_KEY: sb_publishable_M8r81tkCGqXhkf4ma5KuyA_mUizXIQZ
 
     services:
       postgres:
@@ -51,7 +54,7 @@ jobs:
         run: cd packages/database && npx prisma generate
 
       - name: Run Prisma Migrations
-        run: cd packages/database && npx prisma migrate deploy
+        run: cd packages/database && npx prisma migrate deploy && npx prisma db seed
         env:
           DATABASE_URL: postgresql://collabdoc:collabdoc_dev_password@localhost:5432/collabdoc?schema=public
 
@@ -63,8 +66,23 @@ jobs:
 
       - name: Build
         run: npm run build
+        env:
+          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 
       - name: Run Unit & Integration Tests
-        run: npm run test
+        run: npm run test:coverage
         env:
           DATABASE_URL: postgresql://collabdoc:collabdoc_dev_password@localhost:5432/collabdoc?schema=public
+
+      - name: Upload coverage reports to Codecov
+        uses: codecov/codecov-action@v5
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          slug: abhishek-ab7/Realtime-Collaborative-Document-Editor
+
+      - name: Upload test results to Codecov
+        if: ${{ !cancelled() }}
+        uses: codecov/test-results-action@v1
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          slug: abhishek-ab7/Realtime-Collaborative-Document-Editor

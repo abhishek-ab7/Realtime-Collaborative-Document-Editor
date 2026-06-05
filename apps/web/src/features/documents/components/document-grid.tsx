@@ -93,7 +93,7 @@ export function DocumentGrid({
               No results found
             </h3>
             <p className="mb-4 text-sm text-[var(--color-text-secondary)]">
-              We couldn't find any documents matching "{searchQuery}"
+              We couldn&apos;t find any documents matching &quot;{searchQuery}&quot;
             </p>
           </>
         ) : (

@@ -1,0 +1,1143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Obsidian + Google Antigravity Integration Guide</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Fira+Code:wght@400;500;600&display=swap');
+
+  :root {
+    --bg: #0a0d12;
+    --s1: #11161f;
+    --s2: #171e2b;
+    --border: #1f2838;
+    --text: #d4dce8;
+    --muted: #6b7a99;
+    --dim: #3a4558;
+    
+    --primary: #5b8ff7;
+    --success: #2dd4b4;
+    --warning: #fbbf24;
+    --danger: #f87171;
+    --accent: #a78bfa;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Outfit', system-ui, sans-serif;
+    font-size: 14px;
+    line-height: 1.8;
+  }
+
+  .page { max-width: 1100px; margin: 0 auto; padding: 60px 40px 100px; }
+
+  /* ─── HEADER ─── */
+  .header {
+    padding-bottom: 48px;
+    margin-bottom: 60px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .header-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--success);
+    background: rgba(45,212,180,0.1);
+    padding: 4px 12px;
+    border: 1px solid rgba(45,212,180,0.25);
+    border-radius: 20px;
+    margin-bottom: 20px;
+  }
+
+  h1 {
+    font-size: 44px;
+    font-weight: 800;
+    margin-bottom: 12px;
+    color: #fff;
+  }
+
+  h1 em {
+    color: var(--primary);
+    font-style: normal;
+  }
+
+  .subtitle {
+    font-size: 17px;
+    color: var(--muted);
+    max-width: 720px;
+  }
+
+  /* ─── SECTION ─── */
+  .section {
+    margin-bottom: 70px;
+  }
+
+  .section-head {
+    display: flex;
+    align-items: baseline;
+    gap: 16px;
+    margin-bottom: 24px;
+    padding-bottom: 14px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .section-num {
+    font-family: 'Fira Code', monospace;
+    font-size: 12px;
+    color: var(--dim);
+    min-width: 30px;
+  }
+
+  h2 {
+    font-size: 22px;
+    font-weight: 700;
+    color: #fff;
+  }
+
+  p { color: var(--muted); margin-bottom: 14px; }
+  strong { color: var(--text); font-weight: 600; }
+
+  code {
+    font-family: 'Fira Code', monospace;
+    font-size: 12px;
+    background: var(--s2);
+    color: var(--success);
+    padding: 2px 6px;
+    border-radius: 4px;
+  }
+
+  /* ─── ARCHITECTURE DIAGRAM ─── */
+  .diagram-box {
+    background: var(--s1);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 24px;
+    margin: 20px 0;
+    font-family: 'Fira Code', monospace;
+    font-size: 12px;
+    color: #a0b0d8;
+    line-height: 1.8;
+    overflow-x: auto;
+  }
+
+  .diagram-box pre { white-space: pre-wrap; word-wrap: break-word; }
+
+  /* ─── STEPS ─── */
+  .steps {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+  }
+
+  .step {
+    display: grid;
+    grid-template-columns: 40px 1fr;
+    gap: 0 20px;
+    padding-bottom: 28px;
+    position: relative;
+  }
+
+  .step:not(:last-child)::before {
+    content: '';
+    position: absolute;
+    left: 19px;
+    top: 40px;
+    bottom: -28px;
+    width: 1px;
+    background: var(--border);
+  }
+
+  .step-num {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: rgba(91,143,247,0.15);
+    border: 1px solid rgba(91,143,247,0.35);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Fira Code', monospace;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--primary);
+    flex-shrink: 0;
+  }
+
+  .step-body h3 {
+    font-size: 15px;
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 8px;
+  }
+
+  .step-body p {
+    font-size: 14px;
+    margin-bottom: 10px;
+  }
+
+  /* ─── BOXES ─── */
+  .box {
+    background: var(--s1);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 18px;
+    margin: 16px 0;
+  }
+
+  .box-title {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--primary);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .box p { margin-bottom: 8px; }
+
+  .box ul {
+    list-style: none;
+    padding-left: 0;
+  }
+
+  .box ul li {
+    padding-left: 16px;
+    position: relative;
+    margin-bottom: 6px;
+    font-size: 13px;
+    color: var(--muted);
+  }
+
+  .box ul li::before {
+    content: '›';
+    position: absolute;
+    left: 0;
+    color: var(--dim);
+    font-weight: 600;
+  }
+
+  .success-box { border-left: 3px solid var(--success); background: rgba(45,212,180,0.06); }
+  .warning-box { border-left: 3px solid var(--warning); background: rgba(251,191,36,0.06); }
+  .accent-box { border-left: 3px solid var(--accent); background: rgba(167,139,250,0.06); }
+
+  /* ─── CODE BLOCKS ─── */
+  .code-block {
+    background: #050810;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 16px 18px;
+    margin: 14px 0;
+    overflow-x: auto;
+    font-family: 'Fira Code', monospace;
+    font-size: 12.5px;
+    color: #b0bfd8;
+    line-height: 1.7;
+  }
+
+  .code-block pre { margin: 0; }
+
+  .comment { color: var(--dim); }
+  .key { color: var(--accent); }
+  .str { color: var(--success); }
+  .val { color: var(--primary); }
+
+  /* ─── TABLES ─── */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 16px 0;
+    font-size: 13px;
+  }
+
+  table th {
+    font-family: 'Fira Code', monospace;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--dim);
+    text-align: left;
+    padding: 10px 12px;
+    border-bottom: 1px solid var(--border);
+    background: var(--s2);
+  }
+
+  table td {
+    padding: 10px 12px;
+    border-bottom: 1px solid var(--border);
+    color: var(--muted);
+    vertical-align: top;
+  }
+
+  table tr:last-child td { border-bottom: none; }
+
+  /* ─── TWO COLUMN ─── */
+  .two-col {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin: 16px 0;
+  }
+
+  .col-title {
+    font-size: 13px;
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .col-title span { font-size: 16px; }
+
+  /* ─── WORKFLOW ─── */
+  .workflow-box {
+    background: var(--s1);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 20px;
+    margin: 16px 0;
+  }
+
+  .workflow-title {
+    font-size: 14px;
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 12px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .workflow-step {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 12px;
+    margin-bottom: 14px;
+    font-size: 13px;
+  }
+
+  .workflow-step:last-child { margin-bottom: 0; }
+
+  .workflow-num {
+    font-family: 'Fira Code', monospace;
+    font-size: 11px;
+    color: var(--dim);
+    min-width: 50px;
+    font-weight: 600;
+  }
+
+  .workflow-text { color: var(--muted); }
+
+  /* ─── CONFIG FILES ─── */
+  .file-tree {
+    background: #050810;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 16px;
+    margin: 16px 0;
+    font-family: 'Fira Code', monospace;
+    font-size: 12px;
+    color: #b0bfd8;
+    line-height: 1.7;
+  }
+
+  .file-tree pre { margin: 0; }
+
+  /* ─── FOOTER ─── */
+  .footer {
+    padding-top: 32px;
+    margin-top: 60px;
+    border-top: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    font-size: 11px;
+    color: var(--dim);
+  }
+
+  @media (max-width: 768px) {
+    .two-col { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <!-- HEADER -->
+  <div class="header">
+    <span class="header-badge">✓ Production-Ready Integration</span>
+    <h1>Obsidian + <em>Google Antigravity</em><br>Complete Setup Guide</h1>
+    <p class="subtitle">Turn your Obsidian vault into a real-time AI coding companion. Every note, every decision, every reference — automatically available to Antigravity agents while you build.</p>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════
+       SECTION 1 — WHY THIS WORKS
+  ════════════════════════════════════════════════ -->
+  <section class="section">
+    <div class="section-head">
+      <span class="section-num">01</span>
+      <h2>Why Obsidian + Antigravity is Perfect</h2>
+    </div>
+
+    <p>Most developers use Obsidian to store notes in a vault. But they don't connect it to their AI coding agents. You're about to build something better: a <strong>live knowledge base that powers your entire build</strong>.</p>
+
+    <div class="two-col">
+      <div class="box success-box">
+        <div class="box-title">Obsidian's Role</div>
+        <ul>
+          <li><strong>Single source of truth</strong> — all context about your project in one place</li>
+          <li><strong>Git-synced</strong> — every note lives in your repo. History preserved.</li>
+          <li><strong>Linked graph</strong> — "Yjs sync issues" note automatically links to all related decisions, code snippets, reference repos</li>
+          <li><strong>Offline-first</strong> — works when internet drops. Sync on reconnect.</li>
+          <li><strong>Local-first</strong> — AI agents read directly from your filesystem, no API latency</li>
+        </ul>
+      </div>
+
+      <div class="box accent-box">
+        <div class="box-title">Antigravity's Role</div>
+        <ul>
+          <li><strong>Reads your vault</strong> — via file system or GitHub repo context</li>
+          <li><strong>Executes tasks</strong> — while your Obsidian vault stays open in the background</li>
+          <li><strong>References notes</strong> — when agents need context, they pull from your linked notes</li>
+          <li><strong>Updates progress</strong> — agents can write new notes to your vault (with your permission)</li>
+          <li><strong>Parallel execution</strong> — multiple subagents reference the same notes simultaneously</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="diagram-box">
+<pre>
+<span class="comment">┌─────────────────────────────────────┐</span>
+<span class="comment">│         Your Obsidian Vault         │</span>
+<span class="comment">│  (in /docs of your Git repo)        │</span>
+<span class="comment">│                                     │</span>
+<span class="comment">│  00-index.md                        │</span>
+<span class="comment">│  01-phase-1/                        │</span>
+<span class="comment">│    ├─ phase-summary.md              │</span>
+<span class="comment">│    ├─ day-1.md                      │</span>
+<span class="comment">│    └─ learnings.md                  │</span>
+<span class="comment">│  architecture/                      │</span>
+<span class="comment">│    ├─ yjs-sync-design.md            │</span>
+<span class="comment">│    └─ socket-io-flow.md             │</span>
+<span class="comment">│  reference-code/                    │</span>
+<span class="comment">│    └─ hocuspocus-patterns.md        │</span>
+<span class="comment">│                                     │</span>
+<span class="comment">└──────────────┬──────────────────────┘</span>
+               <span class="val">│</span>
+               <span class="val">│ Git-synced to GitHub</span>
+               <span class="val">│</span>
+<span class="comment">┌──────────────▼──────────────────────┐</span>
+<span class="comment">│   Google Antigravity 2.0 Agent     │</span>
+<span class="comment">│                                     │</span>
+<span class="comment">│ Subagent A (Socket.io):            │</span>
+<span class="comment">│ → Reads: architecture/*.md          │</span>
+<span class="comment">│ → Reads: reference-code/*.md        │</span>
+<span class="comment">│ → Writes: 01-phase-1/day-X.md       │</span>
+<span class="comment">│                                     │</span>
+<span class="comment">│ Subagent B (TipTap):                │</span>
+<span class="comment">│ → Reads: same notes                 │</span>
+<span class="comment">│ → Writes: 02-phase-2/day-X.md       │</span>
+<span class="comment">│                                     │</span>
+<span class="comment">└─────────────────────────────────────┘</span>
+</pre>
+    </div>
+
+    <p><strong>The result:</strong> You open Obsidian, see all your notes about the project. You switch to Antigravity, run agents. They read your notes, write back new notes, and everything stays synced. You have a complete audit trail of every decision, every reference, every debug session.</p>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════
+       SECTION 2 — OBSIDIAN VAULT STRUCTURE
+  ════════════════════════════════════════════════ -->
+  <section class="section">
+    <div class="section-head">
+      <span class="section-num">02</span>
+      <h2>Setting Up Your Obsidian Vault</h2>
+    </div>
+
+    <p>Create this folder structure in your repo's <code>/docs</code> directory. This is the vault Obsidian will open and Antigravity will read.</p>
+
+    <div class="file-tree">
+<pre>collab-editor/
+├── apps/
+├── packages/
+├── CLAUDE.md
+├── GEMINI.md
+└── <span class="key">docs/</span>                          <span class="comment"># Your Obsidian vault</span>
+    ├── <span class="key">.obsidian/</span>                <span class="comment"># Local Obsidian settings (git-ignored)</span>
+    │   ├── plugins/
+    │   ├── themes/
+    │   └── settings.json
+    ├── <span class="key">00-index.md</span>              <span class="comment"># Home page — links to all sections</span>
+    ├── <span class="key">01-project-overview/</span>
+    │   ├── project-brief.md
+    │   ├── tech-stack.md
+    │   └── constraints.md
+    ├── <span class="key">02-phases/</span>
+    │   ├── phase-1.md
+    │   ├── phase-2.md
+    │   ├── phase-3.md
+    │   ├── phase-4.md
+    │   └── phase-5.md
+    ├── <span class="key">03-daily-logs/</span>
+    │   ├── phase-1-logs/
+    │   │   ├── day-1.md
+    │   │   ├── day-2.md
+    │   │   └── day-3.md
+    │   └── phase-2-logs/
+    ├── <span class="key">04-architecture/</span>
+    │   ├── yjs-sync-design.md
+    │   ├── socket-io-flow.md
+    │   ├── database-schema.md
+    │   ├── api-routes.md
+    │   └── auth-flow.md
+    ├── <span class="key">05-reference-code/</span>
+    │   ├── hocuspocus-patterns.md
+    │   ├── tiptap-extensions.md
+    │   └── yjs-snippets.md
+    ├── <span class="key">06-debugging/</span>
+    │   ├── yjs-sync-issues.md
+    │   ├── socket-io-errors.md
+    │   └── postgres-migration-fixes.md
+    ├── <span class="key">07-decisions/</span>
+    │   ├── why-yjs-over-ot.md
+    │   ├── socket-io-vs-y-websocket.md
+    │   └── persistence-strategy.md
+    └── <span class="key">.gitignore</span>               <span class="comment"># Ignore .obsidian/ folder</span></pre>
+    </div>
+
+    <div class="section">
+      <div class="section-head" style="border-bottom: none;">
+        <span class="section-num" style="color: var(--dim);">2.1</span>
+        <h3 style="font-size: 17px;">Create the .gitignore for Obsidian</h3>
+      </div>
+      <p style="margin-top: 14px;">Create <code>docs/.gitignore</code>:</p>
+      <div class="code-block">
+<pre><span class="comment"># Obsidian settings (local-only, don't version control)</span>
+.obsidian/
+.DS_Store
+*.swp
+*.swo
+*~</pre>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-head" style="border-bottom: none;">
+        <span class="section-num" style="color: var(--dim);">2.2</span>
+        <h3 style="font-size: 17px;">Create 00-index.md (Your vault home)</h3>
+      </div>
+      <p style="margin-top: 14px;">This is what you see when you open Obsidian. It links everything together:</p>
+      <div class="code-block">
+<pre><span class="comment"># Realtime Collaborative Document Editor</span>
+
+<span class="key">## Project Dashboard</span>
+- [[01-project-overview/project-brief|Project Brief]]
+- [[01-project-overview/tech-stack|Tech Stack]]
+- [[01-project-overview/constraints|Hard Constraints]]
+
+<span class="key">## Phases (5-week build)</span>
+- [[02-phases/phase-1|Phase 1: Foundation (Days 1-5)]]
+- [[02-phases/phase-2|Phase 2: Editor + Sync (Days 6-11)]]
+- [[02-phases/phase-3|Phase 3: Presence (Days 12-18)]]
+- [[02-phases/phase-4|Phase 4: History (Days 19-25)]]
+- [[02-phases/phase-5|Phase 5: Deploy (Days 26-30)]]
+
+<span class="key">## Daily Progress</span>
+- [[03-daily-logs/phase-1-logs/day-1|Phase 1 — Day 1]]
+- [[03-daily-logs/phase-1-logs/day-2|Phase 1 — Day 2]]
+
+<span class="key">## Architecture & Design</span>
+- [[04-architecture/yjs-sync-design|Yjs Sync Design]]
+- [[04-architecture/socket-io-flow|Socket.io Flow]]
+- [[04-architecture/database-schema|Database Schema]]
+- [[04-architecture/api-routes|API Routes]]
+
+<span class="key">## References & Code Patterns</span>
+- [[05-reference-code/hocuspocus-patterns|Hocuspocus Patterns]]
+- [[05-reference-code/tiptap-extensions|TipTap Extensions]]
+
+<span class="key">## Debugging</span>
+- [[06-debugging/yjs-sync-issues|Yjs Sync Issues]]
+- [[06-debugging/socket-io-errors|Socket.io Errors]]
+
+<span class="key">## Decisions Log</span>
+- [[07-decisions/why-yjs-over-ot|Why Yjs over OT?]]</pre>
+      </div>
+    </div>
+
+    <div class="box warning-box">
+      <div class="box-title">⚠ Important: wikilinks format</div>
+      <p>Obsidian uses <code>[[folder/filename|display text]]</code> syntax. When Antigravity writes files, it needs to use the same format. Add this to your GEMINI.md constraint: <em>"When creating new .md files in /docs, always use wikilink format for internal links: [[path/to/file|label]]"</em></p>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════
+       SECTION 3 — OBSIDIAN SETUP (5 MINUTES)
+  ════════════════════════════════════════════════ -->
+  <section class="section">
+    <div class="section-head">
+      <span class="section-num">03</span>
+      <h2>Step-by-Step: Install & Configure Obsidian</h2>
+    </div>
+
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-body">
+          <h3>Download Obsidian</h3>
+          <p>Go to <code>obsidian.md</code>. Download for Mac/Windows/Linux. Install it.</p>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-body">
+          <h3>Open Your Vault</h3>
+          <p>Launch Obsidian. Click "Open Folder as Vault". Navigate to your repo and select the <code>docs/</code> folder. Done — Obsidian now watches all .md files in there.</p>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-body">
+          <h3>Enable Core Plugins (no third-party needed)</h3>
+          <p>Obsidian → Settings → Core Plugins. Turn on:</p>
+          <ul style="margin-top: 8px;">
+            <li><strong>Graph View</strong> — see the linked knowledge graph of your decisions</li>
+            <li><strong>Backlinks</strong> — see what notes link to the current note</li>
+            <li><strong>Outline</strong> — table of contents for the current file</li>
+            <li><strong>Sync</strong> — if you want cloud backup (Obsidian Sync = $8/mo, optional)</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">4</div>
+        <div class="step-body">
+          <h3>Configure Preferences</h3>
+          <p>Settings → Files & Links:</p>
+          <ul style="margin-top: 8px;">
+            <li>New note location: <code>docs/03-daily-logs/current-phase/</code> (will be your log folder)</li>
+            <li>Use [[wikilinks]] (already default)</li>
+            <li>Automatically update internal links: ON</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">5</div>
+        <div class="step-body">
+          <h3>Create the first file</h3>
+          <p>In Obsidian, click "New Note" and paste the 00-index.md content from section 2.2. Save it. You now have a working vault.</p>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">6</div>
+        <div class="step-body">
+          <h3>Commit to Git</h3>
+          <div class="code-block">
+<pre><span class="key">cd</span> collab-editor
+<span class="key">git add docs/</span>
+<span class="key">git commit -m "feat: initialize obsidian vault structure"</span>
+<span class="key">git push</span></pre>
+          </div>
+          <p style="margin-top: 10px;">Your Obsidian vault is now version-controlled.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════
+       SECTION 4 — GEMINI.MD (ANTIGRAVITY CONFIG)
+  ════════════════════════════════════════════════ -->
+  <section class="section">
+    <div class="section-head">
+      <span class="section-num">04</span>
+      <h2>Create GEMINI.md for Antigravity</h2>
+    </div>
+
+    <p>Your GEMINI.md tells Antigravity how to work with your Obsidian vault. Create this in your repo root.</p>
+
+    <div class="code-block">
+<pre><span class="comment"># Antigravity Configuration for Collab Editor</span>
+
+<span class="key">## Obsidian Vault Integration</span>
+The project knowledge base lives in <code>docs/</code> as an Obsidian vault.
+All decisions, architecture notes, debugging logs, and phase progress are here.
+
+<span class="key">### Key Files Agents Should Read First</span>
+- docs/00-index.md — Navigation hub
+- docs/01-project-overview/tech-stack.md — Current stack
+- docs/01-project-overview/constraints.md — Hard rules
+- docs/04-architecture/yjs-sync-design.md — Core architecture
+- docs/04-architecture/api-routes.md — API contract
+
+<span class="key">### When Creating New Notes</span>
+1. Always use markdown (.md extension)
+2. Place task-specific notes in the correct folder:
+   - Phase work → docs/03-daily-logs/phase-X-logs/
+   - Architecture decisions → docs/04-architecture/
+   - Bugs/fixes → docs/06-debugging/
+3. Use wikilinks for internal references: [[path/to/file|display text]]
+4. Create a summary at the end of each phase in docs/02-phases/phase-X.md
+
+<span class="key">### Linking Strategy</span>
+- Obsidian auto-creates backlinks. Don't worry about two-way links manually.
+- When writing docs, reference related files: e.g., "See [[04-architecture/socket-io-flow]]"
+- Use [[404]] syntax (broken links shown in red) to mark TODOs
+
+<span class="key">## Model Assignments</span>
+Primary:   gemini-3.5-flash (fast, coding tasks)
+Complex:   gemini-2.5-pro (architecture decisions, debugging)
+UI:        gemini-3.5-flash (React components, design)
+
+<span class="key">## Parallel Agents Guidelines</span>
+- Subagents can write to docs/ simultaneously (different files only)
+- Each subagent should log its progress: docs/03-daily-logs/phase-X-logs/subagent-A-log.md
+- Final summary merged into phase-specific notes at the end
+
+<span class="key">## No-Go Zones</span>
+DO NOT modify:
+- CLAUDE.md (Claude Code's config)
+- Any files in /apps/web, /apps/server (those are code)
+- .gitignore in project root
+
+OK to modify:
+- All files in docs/
+- PRD.md (if updating requirements)
+- docs/.gitignore (Obsidian local settings)</span></pre>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════
+       SECTION 5 — CONNECTING THEM
+  ════════════════════════════════════════════════ -->
+  <section class="section">
+    <div class="section-head">
+      <span class="section-num">05</span>
+      <h2>How Antigravity Reads Your Obsidian Vault</h2>
+    </div>
+
+    <p>You don't need special integrations. Antigravity works with files directly. Here's the exact workflow:</p>
+
+    <div class="workflow-box">
+      <div class="workflow-title">The Active Workflow (How You Use It)</div>
+      <div class="workflow-step">
+        <span class="workflow-num">1. Open</span>
+        <span class="workflow-text"><strong>Obsidian</strong> on your laptop. You keep it open while building. It's your side-by-side reference.</span>
+      </div>
+      <div class="workflow-step">
+        <span class="workflow-num">2. Open</span>
+        <span class="workflow-text"><strong>Antigravity</strong> (or use Claude Code CLI). Point it at your repo: <code>antigravity open /path/to/collab-editor</code></span>
+      </div>
+      <div class="workflow-step">
+        <span class="workflow-num">3. Reference</span>
+        <span class="workflow-text">When you run a task in Antigravity, include in your prompt: <em>"Read docs/04-architecture/yjs-sync-design.md before implementing."</em> Antigravity fetches it from disk.</span>
+      </div>
+      <div class="workflow-step">
+        <span class="workflow-num">4. Write</span>
+        <span class="workflow-text">Agents write progress notes to <code>docs/03-daily-logs/</code>. You see them appear in Obsidian in real-time (Obsidian auto-refreshes).</span>
+      </div>
+      <div class="workflow-step">
+        <span class="workflow-num">5. Review</span>
+        <span class="workflow-text">Click back to Obsidian. Read what agents wrote. Add your own notes. Create backlinks. The graph grows.</span>
+      </div>
+      <div class="workflow-step">
+        <span class="workflow-num">6. Commit</span>
+        <span class="workflow-text">At the end of the day: <code>git add docs/ && git commit -m "docs: add phase X progress"</code></span>
+      </div>
+    </div>
+
+    <div class="box success-box">
+      <div class="box-title">✓ Key: Antigravity ≠ Connected to Obsidian</div>
+      <p>Antigravity doesn't have a special "Obsidian integration." Instead, you give Antigravity the file paths. The workflow is:</p>
+      <ul>
+        <li><strong>You</strong> tell Antigravity: "Read the file at docs/04-architecture/yjs-sync-design.md"</li>
+        <li><strong>Antigravity</strong> reads it from your filesystem (because you pointed the agent at your repo)</li>
+        <li><strong>Agents</strong> reference the content in their reasoning</li>
+        <li><strong>Agents</strong> write new files back to docs/03-daily-logs/</li>
+        <li><strong>Obsidian</strong> detects the new files and displays them (because Obsidian watches the docs/ folder)</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════
+       SECTION 6 — PROMPT EXAMPLES
+  ════════════════════════════════════════════════ -->
+  <section class="section">
+    <div class="section-head">
+      <span class="section-num">06</span>
+      <h2>Prompt Patterns: How to Tell Antigravity What to Do</h2>
+    </div>
+
+    <p>These are real prompts you'll paste into Antigravity. Notice they all reference files from docs/.</p>
+
+    <div class="box accent-box">
+      <div class="box-title">Example 1: Start a Phase</div>
+      <div class="code-block">
+<pre><span class="comment"># Antigravity Prompt</span>
+
+Read these files:
+- docs/00-index.md (overview)
+- docs/02-phases/phase-2.md (phase specification)
+- docs/04-architecture/yjs-sync-design.md (Yjs reference)
+- docs/05-reference-code/hocuspocus-patterns.md (patterns)
+
+TASK: Plan Phase 2 implementation without writing code yet.
+Do not implement. Only produce:
+  1. List of files to create/modify
+  2. Order of implementation (what depends on what)
+  3. Integration points with existing code
+  4. Any risks you see
+
+When done, write the plan to: docs/02-phases/phase-2-plan.md</pre>
+      </div>
+    </div>
+
+    <div class="box accent-box">
+      <div class="box-title">Example 2: Debug with Context</div>
+      <div class="code-block">
+<pre><span class="comment"># Antigravity Prompt</span>
+
+We have a Yjs sync issue. Read:
+- docs/06-debugging/yjs-sync-issues.md (past issues)
+- docs/04-architecture/yjs-sync-design.md (design)
+- apps/server/src/socket/handlers.ts (current code)
+
+PROBLEM: Clients join but Y.Doc never syncs. State vector is empty.
+
+TASK:
+1. Compare handlers.ts against hocuspocus implementation
+2. Find the deviation
+3. Write the fix
+4. Test it
+
+Then write a summary to: docs/06-debugging/yjs-sync-issues.md
+explaining what was wrong and how you fixed it.</pre>
+      </div>
+    </div>
+
+    <div class="box accent-box">
+      <div class="box-title">Example 3: Parallel Subagents</div>
+      <div class="code-block">
+<pre><span class="comment"># Antigravity Prompt (Parallel Mode)</span>
+
+Read docs/02-phases/phase-3.md (Presence phase spec)
+
+Create two subagents:
+
+Subagent A — "Awareness State":
+  Read docs/04-architecture/yjs-sync-design.md
+  Task: Implement Yjs awareness state + handlers
+  Write output to docs/03-daily-logs/phase-3-logs/awareness-impl.md
+
+Subagent B — "UI Components":
+  Read docs/04-architecture/yjs-sync-design.md
+  Task: Build TipTap CollaborationCursor + presence panel
+  Write output to docs/03-daily-logs/phase-3-logs/ui-impl.md
+
+Both subagents write their progress notes to docs.
+When both complete, summarize: docs/02-phases/phase-3.md</pre>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════
+       SECTION 7 — DAILY WORKFLOW
+  ════════════════════════════════════════════════ -->
+  <section class="section">
+    <div class="section-head">
+      <span class="section-num">07</span>
+      <h2>Daily Ritual: Your Actual Workflow</h2>
+    </div>
+
+    <p>This is what each day looks like once everything is set up. Takes 5–10 minutes to orchestrate.</p>
+
+    <div class="workflow-box">
+      <div class="workflow-title">Morning</div>
+      <div class="workflow-step">
+        <span class="workflow-num">A</span>
+        <span class="workflow-text">Open Obsidian. Click <code>00-index.md</code>. Read what you were working on yesterday (from docs/03-daily-logs/).</span>
+      </div>
+      <div class="workflow-step">
+        <span class="workflow-num">B</span>
+        <span class="workflow-text">Click the current phase folder (e.g., <code>phase-2-logs</code>). Review yesterday's notes.</span>
+      </div>
+      <div class="workflow-step">
+        <span class="workflow-num">C</span>
+        <span class="workflow-text">Create today's log: <code>Cmd+N</code> → name it <code>day-7.md</code> → add a header: <code>## Day 7 — Phase 2</code></span>
+      </div>
+    </div>
+
+    <div class="workflow-box">
+      <div class="workflow-title">Build Time</div>
+      <div class="workflow-step">
+        <span class="workflow-num">A</span>
+        <span class="workflow-text">Open Antigravity (or terminal with Claude Code). Write your prompt referencing the relevant docs/ files.</span>
+      </div>
+      <div class="workflow-step">
+        <span class="workflow-num">B</span>
+        <span class="workflow-text">Run agents. Watch them work. Agents write progress to <code>docs/03-daily-logs/phase-X-logs/</code>.</span>
+      </div>
+      <div class="workflow-step">
+        <span class="workflow-num">C</span>
+        <span class="workflow-text">Agents complete. Switch back to Obsidian. New files appear automatically.</span>
+      </div>
+    </div>
+
+    <div class="workflow-box">
+      <div class="workflow-title">Review & Sync</div>
+      <div class="workflow-step">
+        <span class="workflow-num">A</span>
+        <span class="workflow-text">In Obsidian, read what agents wrote (in docs/03-daily-logs/phase-X-logs/).</span>
+      </div>
+      <div class="workflow-step">
+        <span class="workflow-num">B</span>
+        <span class="workflow-text">Manually add your own notes to today's log (day-7.md): what you learned, what's next, any blockers.</span>
+      </div>
+      <div class="workflow-step">
+        <span class="workflow-num">C</span>
+        <span class="workflow-text">Create wikilinks to related notes. E.g., <code>See [[04-architecture/yjs-sync-design]]</code></span>
+      </div>
+      <div class="workflow-step">
+        <span class="workflow-num">D</span>
+        <span class="workflow-text">Terminal: <code>git add docs/ && git commit -m "docs: day 7 phase 2 progress" && git push</code></span>
+      </div>
+    </div>
+
+    <div class="workflow-box">
+      <div class="workflow-title">End of Week (Friday)</div>
+      <div class="workflow-step">
+        <span class="workflow-num">A</span>
+        <span class="workflow-text">In Obsidian, review the entire week's logs. Click Graph View — see the network of linked decisions.</span>
+      </div>
+      <div class="workflow-step">
+        <span class="workflow-num">B</span>
+        <span class="workflow-text">Update <code>docs/02-phases/phase-X.md</code> with a summary: what worked, what broke, next steps.</span>
+      </div>
+      <div class="workflow-step">
+        <span class="workflow-num">C</span>
+        <span class="workflow-text">Commit. Optional: take a screenshot of Obsidian's graph view for your portfolio/LinkedIn.</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════
+       SECTION 8 — ADVANCED: AUTOMATING WITH MCP
+  ════════════════════════════════════════════════ -->
+  <section class="section">
+    <div class="section-head">
+      <span class="section-num">08</span>
+      <h2>Advanced: Auto-Sync with GitHub & MCP (Optional)</h2>
+    </div>
+
+    <p>Once you have the basics working, you can add automation so Antigravity agents automatically commit changes back to GitHub. This is optional but cool.</p>
+
+    <div class="box success-box">
+      <div class="box-title">What This Does</div>
+      <p>Agent finishes work → automatically commits to a feature branch → pushes to GitHub. You wake up to a ready-to-review PR.</p>
+    </div>
+
+    <div class="section" style="margin-bottom: 0;">
+      <div class="section-head" style="border-bottom: none;">
+        <span class="section-num" style="color: var(--dim);">8.1</span>
+        <h3 style="font-size: 17px;">Enable GitHub MCP in Antigravity</h3>
+      </div>
+      <p style="margin-top: 14px;">Antigravity 2.0 has built-in GitHub integration via MCP (Model Context Protocol).</p>
+
+      <p><strong>Setup:</strong></p>
+      <ol style="color: var(--muted); padding-left: 20px;">
+        <li style="margin-bottom: 8px;">Go to Antigravity Settings → Integrations</li>
+        <li style="margin-bottom: 8px;">Click "Connect GitHub"</li>
+        <li style="margin-bottom: 8px;">Authorize the app (it asks for repo read/write permissions)</li>
+        <li style="margin-bottom: 8px;">Choose your collab-editor repo</li>
+        <li>Done. Agents can now commit directly to GitHub.</li>
+      </ol>
+    </div>
+
+    <div class="section" style="margin-bottom: 0;">
+      <div class="section-head" style="border-bottom: none;">
+        <span class="section-num" style="color: var(--dim);">8.2</span>
+        <h3 style="font-size: 17px;">Tell Agents to Commit & Push</h3>
+      </div>
+      <p style="margin-top: 14px;">Add this to your Antigravity prompts:</p>
+
+      <div class="code-block">
+<pre><span class="comment"># At the end of your Antigravity prompt, add:</span>
+
+<span class="key">COMMIT & PUSH:</span>
+When your work is complete:
+1. Create a new branch: phase-2-impl-[date]
+2. Commit all changes to docs/ and code with a conventional message:
+   git commit -m "feat(phase-2): implement socket.io sync handlers"
+3. Push the branch: git push -u origin phase-2-impl-[date]
+4. Create a pull request with a summary in the PR description
+
+<span class="key">PR Template:</span>
+Title: Phase 2: Socket.io + Yjs Sync Implementation
+Body:
+- [ ] Sync-step1/step2 protocol implemented
+- [ ] Server-side Y.Doc management working
+- [ ] Client sync verified in test (2 browsers)
+- [ ] No TypeScript errors (strict mode)
+
+Close with: "See docs/02-phases/phase-2.md for full details."</pre>
+      </div>
+    </div>
+
+    <div class="box warning-box">
+      <div class="box-title">⚠ Important: GitHub Token Security</div>
+      <p>Antigravity handles your GitHub token securely. It's stored in your local Antigravity config (not in git). Never commit tokens. If you're paranoid, use a GitHub fine-grained PAT (Personal Access Token) with limited scope.</p>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════
+       SECTION 9 — TROUBLESHOOTING
+  ════════════════════════════════════════════════ -->
+  <section class="section">
+    <div class="section-head">
+      <span class="section-num">09</span>
+      <h2>Troubleshooting: What Can Go Wrong</h2>
+    </div>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Problem</th>
+          <th>Solution</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Obsidian shows old files, not the new ones Antigravity wrote</strong></td>
+          <td>Obsidian caches metadata. Click the refresh button (or close/reopen). Usually fixes within 10 seconds. If not: Obsidian → Settings → Files & Links → toggle "Automatically update internal links" off then back on.</td>
+        </tr>
+        <tr>
+          <td><strong>Antigravity can't read docs/ files</strong></td>
+          <td>Make sure you pointed Antigravity at the repo root: <code>antigravity open /path/to/collab-editor</code> (NOT /path/to/collab-editor/docs). Antigravity reads the whole tree.</td>
+        </tr>
+        <tr>
+          <td><strong>Agents are writing files to the wrong folder</strong></td>
+          <td>Your GEMINI.md is unclear about folder structure. Add explicit paths to the prompt: <code>"Write the output file to: docs/03-daily-logs/phase-X-logs/file-name.md (full path)"</code></td>
+        </tr>
+        <tr>
+          <td><strong>Wikilinks are broken (red text in Obsidian)</strong></td>
+          <td>The file path is wrong or the file doesn't exist. Hover over the red link → click the suggestion → or create the missing file. Obsidian will fix the link automatically.</td>
+        </tr>
+        <tr>
+          <td><strong>Git merge conflicts in docs/ after agent pushes</strong></td>
+          <td>Agent writes to docs/03-daily-logs/phase-X-logs/subagent-A.md and you manually edit docs/03-daily-logs/phase-X-logs/day-5.md — Git conflicts. Solution: agents should only touch their own files. You manually edit daily logs. Document this in GEMINI.md.</td>
+        </tr>
+        <tr>
+          <td><strong>Antigravity "forgets" context between sessions</strong></td>
+          <td>Antigravity in 2026 has auto-compaction, but you can manually help: at the start of a new session, add to your prompt: <code>"First, read docs/02-phases/phase-X.md to get context on what we're building."</code></td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════
+       SECTION 10 — FINAL SETUP CHECKLIST
+  ════════════════════════════════════════════════ -->
+  <section class="section">
+    <div class="section-head">
+      <span class="section-num">10</span>
+      <h2>Complete Setup Checklist</h2>
+    </div>
+
+    <p>Use this to verify everything is connected before you start building.</p>
+
+    <table style="margin-top: 20px;">
+      <thead>
+        <tr>
+          <th style="width: 40px;">✓</th>
+          <th>Task</th>
+          <th>Verify</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td style="text-align: center;">☐</td>
+          <td><strong>Repo structure created</strong></td>
+          <td>docs/ folder exists in repo root with .gitignore (ignores .obsidian/)</td>
+        </tr>
+        <tr>
+          <td style="text-align: center;">☐</td>
+          <td><strong>Obsidian installed</strong></td>
+          <td>Launch Obsidian, open docs/ as vault. See 00-index.md. No errors.</td>
+        </tr>
+        <tr>
+          <td style="text-align: center;">☐</td>
+          <td><strong>Folder structure in docs/</strong></td>
+          <td>All 7 folders exist: 00-index, 01-project-overview, 02-phases, 03-daily-logs, 04-architecture, 05-reference-code, 06-debugging, 07-decisions</td>
+        </tr>
+        <tr>
+          <td style="text-align: center;">☐</td>
+          <td><strong>00-index.md created</strong></td>
+          <td>Open it in Obsidian. See wikilinks to all sections. No red broken links.</td>
+        </tr>
+        <tr>
+          <td style="text-align: center;">☐</td>
+          <td><strong>GEMINI.md created</strong></td>
+          <td>File exists in repo root. Specifies Obsidian vault integration rules.</td>
+        </tr>
+        <tr>
+          <td style="text-align: center;">☐</td>
+          <td><strong>Antigravity installed & configured</strong></td>
+          <td>Download from antigravity.google.dev. Sign in. Open your repo folder.</td>
+        </tr>
+        <tr>
+          <td style="text-align: center;">☐</td>
+          <td><strong>Test: Antigravity can read docs/</strong></td>
+          <td>In Antigravity, write: "Read docs/00-index.md and tell me what you see." It should print the content.</td>
+        </tr>
+        <tr>
+          <td style="text-align: center;">☐</td>
+          <td><strong>Test: Antigravity can write files</strong></td>
+          <td>Run: "Create a file at docs/03-daily-logs/test.md with content: 'Test file'". Check Obsidian — new file appears.</td>
+        </tr>
+        <tr>
+          <td style="text-align: center;">☐</td>
+          <td><strong>Obsidian graph view working</strong></td>
+          <td>Obsidian sidebar → click Graph View. You should see nodes (files) connected by lines (wikilinks).</td>
+        </tr>
+        <tr>
+          <td style="text-align: center;">☐</td>
+          <td><strong>Git sync working</strong></td>
+          <td>Terminal: <code>git add docs/ && git commit -m "init: obsidian vault setup" && git push</code>. Check GitHub — docs/ is there.</td>
+        </tr>
+        <tr>
+          <td style="text-align: center;">☐</td>
+          <td><strong>PRD linked in GEMINI.md</strong></td>
+          <td>GEMINI.md references docs/00-index.md. Test prompt: "Read the index and summarize the phases."</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="box success-box" style="margin-top: 24px;">
+      <div class="box-title">✓ Ready to Build</div>
+      <p>Once all checkboxes are done, you're ready. Open a new Antigravity session and start Phase 1.</p>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <div class="footer">
+    <span>Obsidian + Antigravity Integration Guide · June 2026</span>
+    <span>Collab Editor Project</span>
+  </div>
+
+</div>
+</body>
+</html>

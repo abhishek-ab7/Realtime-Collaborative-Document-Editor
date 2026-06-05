@@ -10,12 +10,28 @@ import TaskList from '@tiptap/extension-task-list';
 import TaskItem from '@tiptap/extension-task-item';
 import CodeBlockLowlight from '@tiptap/extension-code-block-lowlight';
 import HorizontalRule from '@tiptap/extension-horizontal-rule';
+import Collaboration from '@tiptap/extension-collaboration';
+import CollaborationCursor from '@tiptap/extension-collaboration-cursor';
 import { common, createLowlight } from 'lowlight';
+import type * as Y from 'yjs';
+import type { Awareness } from 'y-protocols/awareness';
 
 const lowlight = createLowlight(common);
 
-export function getEditorExtensions() {
-  return [
+interface ExtensionOptions {
+  /** Y.Doc for collaborative editing mode */
+  yjsDoc?: Y.Doc;
+  /** Awareness instance for cursor sync */
+  awareness?: Awareness;
+  /** Current user info for cursor labels */
+  user?: {
+    name: string;
+    color: string;
+  };
+}
+
+export function getEditorExtensions(options?: ExtensionOptions) {
+  const extensions = [
     StarterKit.configure({
       codeBlock: false, // Using CodeBlockLowlight instead
       heading: { levels: [1, 2, 3] },
@@ -27,6 +43,8 @@ export function getEditorExtensions() {
         keepMarks: true,
         keepAttributes: false,
       },
+      // Disable history in collab mode — Yjs provides its own undo manager
+      ...(options?.yjsDoc ? { history: false } : {}),
     }),
     Placeholder.configure({
       placeholder: 'Start writing...',
@@ -52,4 +70,27 @@ export function getEditorExtensions() {
     CodeBlockLowlight.configure({ lowlight }),
     HorizontalRule,
   ];
+
+  // Add collaboration extensions when Y.Doc is provided
+  if (options?.yjsDoc) {
+    extensions.push(
+      Collaboration.configure({
+        document: options.yjsDoc,
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      }) as any,
+    );
+
+    if (options?.awareness && options?.user) {
+      extensions.push(
+        CollaborationCursor.configure({
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          provider: { awareness: options.awareness } as any,
+          user: options.user,
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        }) as any,
+      );
+    }
+  }
+
+  return extensions;
 }

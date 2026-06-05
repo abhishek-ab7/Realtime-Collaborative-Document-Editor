@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { render, screen, fireEvent } from '@testing-library/react';
 import { describe, test, expect, vi, beforeEach } from 'vitest';
 
@@ -23,7 +24,8 @@ vi.mock('react-dom', async (importOriginal) => {
   const actual = await importOriginal<typeof import('react-dom')>();
   return {
     ...actual,
-    createPortal: (children: React.ReactNode, _container: Element) => children,
+
+    createPortal: (children: React.ReactNode) => children,
   };
 });
 

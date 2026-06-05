@@ -41,20 +41,14 @@ export default async function EditorPage({ params }: EditorPageProps) {
       // Silently ignore — not critical
     });
 
-  // Get the latest Yjs snapshot to reconstruct content
-  // Phase 05 will deserialize Yjs state; for now we use an empty initial state
-  const snapshot = await prisma.documentSnapshot.findFirst({
-    where: { documentId },
-    orderBy: { createdAt: 'desc' },
-    select: { id: true },
-  });
-
   return (
     <DocumentEditorClient
       documentId={documentId}
       title={document.title}
       content=""
       lastAccessedAt={document.lastAccessedAt}
+      userName={session.user.name || 'Anonymous'}
+      userId={userId}
     />
   );
 }

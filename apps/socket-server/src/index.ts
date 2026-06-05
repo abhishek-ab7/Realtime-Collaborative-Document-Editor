@@ -2,16 +2,12 @@ import express from 'express';
 import { createServer } from 'http';
 import { Server } from 'socket.io';
 import cors from 'cors';
-import pino from 'pino';
+import { logger } from './lib/logger';
 import { socketAuthMiddleware } from './middleware/auth';
-
-const logger = pino({
-  level: process.env.LOG_LEVEL || 'info',
-  transport:
-    process.env.NODE_ENV === 'development'
-      ? { target: 'pino-pretty', options: { colorize: true } }
-      : undefined,
-});
+import { registerRoomHandlers, handleLeaveRoom } from './handlers/room';
+import { registerCollaborationHandlers } from './handlers/collaboration';
+import { registerAwarenessHandlers } from './handlers/awareness';
+import { roomManager } from './rooms/room-manager';
 
 const PORT = parseInt(process.env.PORT || '3001', 10);
 const CORS_ORIGIN = process.env.CORS_ORIGIN || 'http://localhost:3000';
@@ -20,11 +16,25 @@ const CORS_ORIGIN = process.env.CORS_ORIGIN || 'http://localhost:3000';
 const app = express();
 app.use(cors({ origin: CORS_ORIGIN }));
 
+app.get('/', (_req, res) => {
+  res.json({
+    name: 'Collabdoc Collaboration Server',
+    status: 'healthy',
+    websocket: 'enabled',
+    uptime: process.uptime(),
+    healthCheck: '/health',
+  });
+});
+
 app.get('/health', (_req, res) => {
+  const stats = roomManager.getStats();
   res.json({
     status: 'ok',
     uptime: process.uptime(),
     timestamp: new Date().toISOString(),
+    rooms: stats.activeRooms,
+    connections: stats.totalConnections,
+    details: stats.rooms,
   });
 });
 
@@ -42,17 +52,46 @@ const io = new Server(httpServer, {
 
 io.use(socketAuthMiddleware);
 
-// TODO: Phase 4 — Add room handlers
-// TODO: Phase 4 — Add collaboration handlers
-// TODO: Phase 5 — Add awareness handlers
-
 io.on('connection', (socket) => {
   logger.info({ socketId: socket.id }, 'Client connected');
 
+  // Register all handler groups
+  registerRoomHandlers(io, socket);
+  registerCollaborationHandlers(io, socket);
+  registerAwarenessHandlers(io, socket);
+
+  // ─── DISCONNECT HANDLER ───
   socket.on('disconnect', (reason) => {
     logger.info({ socketId: socket.id, reason }, 'Client disconnected');
+
+    // Clean up all rooms this socket was in
+    const rooms = (socket as any).__rooms as Set<string> | undefined;
+    if (rooms) {
+      for (const documentId of rooms) {
+        handleLeaveRoom(io, socket, documentId);
+      }
+    }
   });
 });
+
+// ─── GRACEFUL SHUTDOWN ───
+async function gracefulShutdown(signal: string) {
+  logger.info({ signal }, 'Received shutdown signal, saving all rooms...');
+  await roomManager.shutdownAll();
+  httpServer.close(() => {
+    logger.info('HTTP server closed');
+    process.exit(0);
+  });
+
+  // Force exit after 10 seconds
+  setTimeout(() => {
+    logger.error('Forced exit after timeout');
+    process.exit(1);
+  }, 10000);
+}
+
+process.on('SIGTERM', () => gracefulShutdown('SIGTERM'));
+process.on('SIGINT', () => gracefulShutdown('SIGINT'));
 
 if (process.env.NODE_ENV !== 'test') {
   httpServer.listen(PORT, () => {

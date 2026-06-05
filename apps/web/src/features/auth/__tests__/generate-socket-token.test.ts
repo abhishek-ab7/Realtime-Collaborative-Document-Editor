@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { describe, test, expect, vi, beforeEach } from 'vitest';
 import jwt from 'jsonwebtoken';
 import { generateSocketToken } from '../actions/generate-socket-token';

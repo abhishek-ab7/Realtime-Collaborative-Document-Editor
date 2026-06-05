@@ -22,8 +22,6 @@ export function EditorHeader({
   title: initialTitle,
   lastSavedAt,
   isSaving = false,
-  wordCount = 0,
-  characterCount = 0,
 }: EditorHeaderProps) {
   const [title, setTitle] = useState(initialTitle);
   const [isEditing, setIsEditing] = useState(false);

@@ -36,7 +36,6 @@ export default function DashboardPage() {
   };
 
   const handleTrash = async (id: string) => {
-    const doc = documents.find((d) => d.id === id);
     try {
       await updateDocument(id, { status: 'TRASHED' });
       toast.success('Moved to trash', {
@@ -47,7 +46,7 @@ export default function DashboardPage() {
               await updateDocument(id, { status: 'ACTIVE' });
               toast.success('Document restored');
               refresh();
-            } catch (err) {
+            } catch {
               toast.error('Failed to restore document');
             }
           },
