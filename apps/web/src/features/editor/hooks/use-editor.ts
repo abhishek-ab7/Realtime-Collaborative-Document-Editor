@@ -1,6 +1,7 @@
 'use client';
 
 import { useEditor as useTipTapEditor } from '@tiptap/react';
+import { useRef, useEffect } from 'react';
 import { getEditorExtensions } from '../lib/extensions';
 import type * as Y from 'yjs';
 import type { Awareness } from 'y-protocols/awareness';
@@ -26,6 +27,7 @@ export function useDocumentEditor({
   user,
 }: UseEditorOptions = {}) {
   const isCollaborative = !!yjsDoc;
+  const typingTimerRef = useRef<NodeJS.Timeout | null>(null);
 
   const editor = useTipTapEditor({
     extensions: getEditorExtensions({
@@ -43,12 +45,28 @@ export function useDocumentEditor({
         'data-testid': 'tiptap-editor',
       },
     },
-    onUpdate({ editor }) {
+    onUpdate({ editor, transaction }) {
       if (onUpdate) {
         onUpdate(editor.getHTML());
       }
+      const isRemote = transaction.getMeta('y-sync$') !== undefined;
+      if (awareness && !isRemote && transaction.docChanged) {
+        awareness.setLocalStateField('isTyping', true);
+        if (typingTimerRef.current) clearTimeout(typingTimerRef.current);
+        typingTimerRef.current = setTimeout(() => {
+          awareness.setLocalStateField('isTyping', false);
+        }, 2000);
+      }
     },
   });
+
+  useEffect(() => {
+    return () => {
+      if (typingTimerRef.current) {
+        clearTimeout(typingTimerRef.current);
+      }
+    };
+  }, []);
 
   return editor;
 }

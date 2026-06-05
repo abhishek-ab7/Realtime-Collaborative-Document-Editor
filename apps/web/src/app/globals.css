@@ -160,6 +160,27 @@ body {
 }
 
 /* ─── COLLABORATION CURSOR STYLES ─── */
+@keyframes caret-pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.4;
+  }
+}
+
+@keyframes cursor-label-appear {
+  from {
+    opacity: 0;
+    transform: translateY(2px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
 .collaboration-cursor__caret {
   position: relative;
   margin-left: -1px;
@@ -168,21 +189,25 @@ body {
   border-right: 0;
   word-break: normal;
   pointer-events: none;
+  animation: caret-pulse 1.2s infinite ease-in-out;
+  transition: all 0.1s ease-out;
 }
 
 .collaboration-cursor__label {
   position: absolute;
   top: -1.4em;
   left: -1px;
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 600;
   line-height: normal;
-  padding: 0.1rem 0.3rem;
-  border-radius: 3px 3px 3px 0;
+  padding: 0.15rem 0.35rem;
+  border-radius: 4px 4px 4px 0;
   color: white;
   white-space: nowrap;
   pointer-events: none;
   user-select: none;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  animation: cursor-label-appear 0.2s ease-out;
 }
 
 /* ─── TIPTAP EDITOR STYLES ─── */
@@ -467,32 +492,6 @@ body {
 /* Selection */
 .ProseMirror ::selection {
   background: #4f46e5/20;
-}
-
-/* Collaborative cursor (Phase 05) */
-.collaboration-cursor__caret {
-  border-left: 2px solid;
-  border-right: 2px solid;
-  margin-left: -1px;
-  margin-right: -1px;
-  pointer-events: none;
-  position: relative;
-  word-break: normal;
-}
-.collaboration-cursor__label {
-  border-radius: 3px 3px 3px 0;
-  color: #fff;
-  font-size: 0.7rem;
-  font-style: normal;
-  font-weight: 600;
-  left: -1px;
-  line-height: 1;
-  padding: 0.15rem 0.3rem;
-  position: absolute;
-  top: -1.4em;
-  user-select: none;
-  white-space: nowrap;
-  pointer-events: none;
 }
 
 /* Print styles */

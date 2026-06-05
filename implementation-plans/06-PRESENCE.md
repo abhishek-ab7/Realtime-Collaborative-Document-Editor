@@ -1,7 +1,7 @@
 # Phase 06 — Live Presence & Cursors
 
 > **Days:** 22–24  
-> **Status:** ⬜ Not Started  
+> **Status:** ✅ Complete  
 > **Dependencies:** Phase 05 (Realtime Collaboration)  
 > **Milestone:** M6-PRESENCE  
 > **PRD Sections:** 5.4 (Presence Awareness)

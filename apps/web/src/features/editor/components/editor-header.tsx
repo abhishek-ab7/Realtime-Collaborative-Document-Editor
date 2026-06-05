@@ -7,6 +7,8 @@ import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { updateDocument } from '@/features/documents/actions/document-actions';
 import { toast } from 'sonner';
+import { PresenceAvatars } from '@/features/collaboration/components/presence-avatars';
+import { TypingIndicator } from '@/features/collaboration/components/typing-indicator';
 
 interface EditorHeaderProps {
   documentId: string;
@@ -110,10 +112,12 @@ export function EditorHeader({
               {statusLabel}
             </span>
           )}
+          <TypingIndicator />
         </div>
 
         {/* Right: Actions */}
-        <div className="flex shrink-0 items-center gap-2">
+        <div className="flex shrink-0 items-center gap-4">
+          <PresenceAvatars />
           <Button
             variant="outline"
             size="sm"
