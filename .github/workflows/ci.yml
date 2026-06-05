@@ -54,7 +54,7 @@ jobs:
         run: cd packages/database && npx prisma generate
 
       - name: Run Prisma Migrations
-        run: cd packages/database && npx prisma migrate deploy
+        run: cd packages/database && npx prisma migrate deploy && npx prisma db seed
         env:
           DATABASE_URL: postgresql://collabdoc:collabdoc_dev_password@localhost:5432/collabdoc?schema=public
 
