@@ -1,36 +1,27 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
-generator client {
-  provider = "prisma-client-js"
-}
-
-// ─────────────────────────────────────────────
-// USERS
-// ─────────────────────────────────────────────
-
 model User {
-  id            String    @id @default(cuid())
-  email         String    @unique
-  name          String?
-  avatarUrl     String?   @map("avatar_url")
-  emailVerified DateTime? @map("email_verified")
-
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
-
-  // Auth.js relations
-  accounts Account[]
-  sessions Session[]
-
-  // Application relations
-  ownedDocuments  Document[]        @relation("DocumentOwner")
+  id              String            @id @default(cuid())
+  email           String            @unique
+  name            String?
+  avatarUrl       String?           @map("avatar_url")
+  emailVerified   DateTime?         @map("email_verified")
+  createdAt       DateTime          @default(now()) @map("created_at")
+  updatedAt       DateTime          @updatedAt @map("updated_at")
+  accounts        Account[]
+  activityLogs    ActivityLog[]
   collaborations  Collaborator[]
   createdVersions DocumentVersion[]
+  ownedDocuments  Document[]        @relation("DocumentOwner")
+  sessions        Session[]
   createdLinks    ShareLink[]
-  activityLogs    ActivityLog[]
 
   @@map("users")
 }
@@ -41,15 +32,14 @@ model Account {
   type              String
   provider          String
   providerAccountId String  @map("provider_account_id")
-  refresh_token     String? @db.Text
-  access_token      String? @db.Text
+  refresh_token     String?
+  access_token      String?
   expires_at        Int?
   token_type        String?
   scope             String?
-  id_token          String? @db.Text
+  id_token          String?
   session_state     String?
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([provider, providerAccountId])
   @@map("accounts")
@@ -60,8 +50,7 @@ model Session {
   sessionToken String   @unique @map("session_token")
   userId       String   @map("user_id")
   expires      DateTime
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("sessions")
 }
@@ -75,50 +64,29 @@ model VerificationToken {
   @@map("verification_tokens")
 }
 
-// ─────────────────────────────────────────────
-// DOCUMENTS
-// ─────────────────────────────────────────────
-
-enum DocumentStatus {
-  ACTIVE
-  TRASHED
-}
-
 model Document {
-  id             String         @id @default(cuid())
-  ownerId        String         @map("owner_id")
-  title          String         @default("Untitled Document")
-  status         DocumentStatus @default(ACTIVE)
-  isStarred      Boolean        @default(false) @map("is_starred")
-  wordCount      Int            @default(0) @map("word_count")
-  createdAt      DateTime       @default(now()) @map("created_at")
-  updatedAt      DateTime       @updatedAt @map("updated_at")
-  deletedAt      DateTime?      @map("deleted_at")
-  lastAccessedAt DateTime?      @map("last_accessed_at")
+  id             String             @id @default(cuid())
+  ownerId        String             @map("owner_id")
+  title          String             @default("Untitled Document")
+  status         DocumentStatus     @default(ACTIVE)
+  isStarred      Boolean            @default(false) @map("is_starred")
+  wordCount      Int                @default(0) @map("word_count")
+  createdAt      DateTime           @default(now()) @map("created_at")
+  updatedAt      DateTime           @updatedAt @map("updated_at")
+  deletedAt      DateTime?          @map("deleted_at")
+  lastAccessedAt DateTime?          @map("last_accessed_at")
+  activityLogs   ActivityLog[]
+  collaborators  Collaborator[]
+  snapshots      DocumentSnapshot[]
+  versions       DocumentVersion[]
+  owner          User               @relation("DocumentOwner", fields: [ownerId], references: [id])
+  shareLinks     ShareLink[]
 
-  // Relations
-  owner         User               @relation("DocumentOwner", fields: [ownerId], references: [id])
-  collaborators Collaborator[]
-  versions      DocumentVersion[]
-  snapshots     DocumentSnapshot[]
-  shareLinks    ShareLink[]
-  activityLogs  ActivityLog[]
-
-  // Indexes
   @@index([ownerId, status])
   @@index([ownerId, isStarred])
   @@index([ownerId, updatedAt])
   @@index([ownerId, lastAccessedAt])
   @@map("documents")
-}
-
-// ─────────────────────────────────────────────
-// COLLABORATORS
-// ─────────────────────────────────────────────
-
-enum CollaboratorRole {
-  EDITOR
-  VIEWER
 }
 
 model Collaborator {
@@ -127,91 +95,93 @@ model Collaborator {
   userId     String           @map("user_id")
   role       CollaboratorRole @default(VIEWER)
   invitedBy  String?          @map("invited_by")
-
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
-
-  document Document @relation(fields: [documentId], references: [id], onDelete: Cascade)
-  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt  DateTime         @default(now()) @map("created_at")
+  updatedAt  DateTime         @updatedAt @map("updated_at")
+  document   Document         @relation(fields: [documentId], references: [id], onDelete: Cascade)
+  user       User             @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([documentId, userId])
   @@index([userId])
   @@map("collaborators")
 }
 
-// ─────────────────────────────────────────────
-// DOCUMENT VERSIONS (user-facing history)
-// ─────────────────────────────────────────────
-
 model DocumentVersion {
-  id          String @id @default(cuid())
-  documentId  String @map("document_id")
-  createdBy   String @map("created_by")
-  versionNum  Int    @map("version_num")
-  yjsSnapshot Bytes  @map("yjs_snapshot") // Full Yjs state for restore
-  plainText   String @map("plain_text") @db.Text // For diff computation
-  titleAtTime String @map("title_at_time")
-  byteSize    Int    @map("byte_size")
-
-  createdAt DateTime @default(now()) @map("created_at")
-
-  document Document @relation(fields: [documentId], references: [id], onDelete: Cascade)
-  creator  User     @relation(fields: [createdBy], references: [id])
+  id          String   @id @default(cuid())
+  documentId  String   @map("document_id")
+  createdBy   String   @map("created_by")
+  versionNum  Int      @map("version_num")
+  yjsSnapshot Bytes    @map("yjs_snapshot")
+  plainText   String   @map("plain_text")
+  titleAtTime String   @map("title_at_time")
+  byteSize    Int      @map("byte_size")
+  createdAt   DateTime @default(now()) @map("created_at")
+  creator     User     @relation(fields: [createdBy], references: [id])
+  document    Document @relation(fields: [documentId], references: [id], onDelete: Cascade)
 
   @@unique([documentId, versionNum])
   @@index([documentId, createdAt])
   @@map("document_versions")
 }
 
-// ─────────────────────────────────────────────
-// DOCUMENT SNAPSHOTS (internal persistence)
-// ─────────────────────────────────────────────
-
 model DocumentSnapshot {
-  id          String @id @default(cuid())
-  documentId  String @map("document_id")
-  yjsState    Bytes  @map("yjs_state") // Y.encodeStateAsUpdate(ydoc)
-  stateVector Bytes  @map("state_vector") // Y.encodeStateVector(ydoc)
-  byteSize    Int    @map("byte_size")
-
-  createdAt DateTime @default(now()) @map("created_at")
-
-  document Document @relation(fields: [documentId], references: [id], onDelete: Cascade)
+  id          String   @id @default(cuid())
+  documentId  String   @map("document_id")
+  yjsState    Bytes    @map("yjs_state")
+  stateVector Bytes    @map("state_vector")
+  byteSize    Int      @map("byte_size")
+  createdAt   DateTime @default(now()) @map("created_at")
+  document    Document @relation(fields: [documentId], references: [id], onDelete: Cascade)
 
   @@index([documentId, createdAt])
   @@map("document_snapshots")
-}
-
-// ─────────────────────────────────────────────
-// SHARE LINKS
-// ─────────────────────────────────────────────
-
-enum SharePermission {
-  VIEW
-  EDIT
 }
 
 model ShareLink {
   id         String          @id @default(cuid())
   documentId String          @map("document_id")
   createdBy  String          @map("created_by")
-  tokenHash  String          @unique @map("token_hash") // SHA-256 of actual token
+  tokenHash  String          @unique @map("token_hash")
   permission SharePermission @default(VIEW)
   isActive   Boolean         @default(true) @map("is_active")
   expiresAt  DateTime?       @map("expires_at")
-
-  createdAt DateTime @default(now()) @map("created_at")
-
-  document Document @relation(fields: [documentId], references: [id], onDelete: Cascade)
-  creator  User     @relation(fields: [createdBy], references: [id])
+  createdAt  DateTime        @default(now()) @map("created_at")
+  creator    User            @relation(fields: [createdBy], references: [id])
+  document   Document        @relation(fields: [documentId], references: [id], onDelete: Cascade)
 
   @@index([documentId])
   @@map("share_links")
 }
 
-// ─────────────────────────────────────────────
-// ACTIVITY LOGS (audit trail)
-// ─────────────────────────────────────────────
+model ActivityLog {
+  id         String         @id @default(cuid())
+  documentId String         @map("document_id")
+  userId     String         @map("user_id")
+  action     ActivityAction
+  metadata   Json?
+  ipAddress  String?        @map("ip_address")
+  createdAt  DateTime       @default(now()) @map("created_at")
+  document   Document       @relation(fields: [documentId], references: [id], onDelete: Cascade)
+  user       User           @relation(fields: [userId], references: [id])
+
+  @@index([documentId, createdAt])
+  @@index([userId, createdAt])
+  @@map("activity_logs")
+}
+
+enum DocumentStatus {
+  ACTIVE
+  TRASHED
+}
+
+enum CollaboratorRole {
+  EDITOR
+  VIEWER
+}
+
+enum SharePermission {
+  VIEW
+  EDIT
+}
 
 enum ActivityAction {
   DOCUMENT_CREATED
@@ -228,22 +198,4 @@ enum ActivityAction {
   VERSION_CREATED
   VERSION_RESTORED
   DOCUMENT_OPENED
-}
-
-model ActivityLog {
-  id         String         @id @default(cuid())
-  documentId String         @map("document_id")
-  userId     String         @map("user_id")
-  action     ActivityAction
-  metadata   Json? // Additional context (e.g., old/new title, role change)
-  ipAddress  String?        @map("ip_address")
-
-  createdAt DateTime @default(now()) @map("created_at")
-
-  document Document @relation(fields: [documentId], references: [id], onDelete: Cascade)
-  user     User     @relation(fields: [userId], references: [id])
-
-  @@index([documentId, createdAt])
-  @@index([userId, createdAt])
-  @@map("activity_logs")
 }

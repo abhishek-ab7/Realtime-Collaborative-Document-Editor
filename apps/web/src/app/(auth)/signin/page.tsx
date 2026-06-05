@@ -1,12 +1,11 @@
-import { redirect } from 'next/navigation';
-import { auth } from '@/lib/auth';
-import { SignInButton } from '@/features/auth/components/sign-in-button';
+import Link from 'next/link';
+import { AuthForm } from '@/features/auth/components/auth-form';
 import type { Metadata } from 'next';
 import { RefreshCw, MousePointer, History } from 'lucide-react';
 
 export const metadata: Metadata = {
   title: 'Sign In',
-  description: 'Sign in to Collabdoc with your Google account.',
+  description: 'Sign in to Collabdoc with your account.',
 };
 
 interface SignInPageProps {
@@ -14,13 +13,7 @@ interface SignInPageProps {
 }
 
 export default async function SignInPage({ searchParams }: SignInPageProps) {
-  const session = await auth();
   const params = await searchParams;
-
-  // If already authenticated, redirect to dashboard
-  if (session) {
-    redirect(params.callbackUrl ?? '/dashboard');
-  }
 
   return (
     <div className="flex w-full flex-col items-center gap-8">
@@ -46,7 +39,7 @@ export default async function SignInPage({ searchParams }: SignInPageProps) {
 
         {/* Typography */}
         <h1 className="mb-2 text-2xl font-bold tracking-tight text-[var(--color-text-primary)]">
-          Welcome to Collabdoc
+          Welcome back
         </h1>
         <p className="mb-6 text-sm text-[var(--color-text-secondary)]">
           Sign in to start collaborating
@@ -67,7 +60,17 @@ export default async function SignInPage({ searchParams }: SignInPageProps) {
         )}
 
         {/* Action Button */}
-        <SignInButton callbackUrl={params.callbackUrl} />
+        <AuthForm view="signin" callbackUrl={params.callbackUrl} />
+
+        <p className="mt-4 text-sm text-[var(--color-text-secondary)]">
+          Don't have an account?{' '}
+          <Link
+            href="/signup"
+            className="font-medium text-[var(--color-brand-primary)] hover:underline"
+          >
+            Sign up
+          </Link>
+        </p>
 
         {/* Fine Print */}
         <p className="mt-6 text-xs text-[var(--color-text-tertiary)]">

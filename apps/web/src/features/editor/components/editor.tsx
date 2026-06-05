@@ -1,23 +1,38 @@
 'use client';
 
-import { useCallback, useEffect, useRef } from 'react';
 import { EditorContent } from '@tiptap/react';
 import { useDocumentEditor } from '../hooks/use-editor';
 import { EditorToolbar } from './editor-toolbar';
 import { EditorBubbleMenu } from './editor-bubble-menu';
 import { WordCount } from './word-count';
+import type * as Y from 'yjs';
+import type { Awareness } from 'y-protocols/awareness';
 
 interface EditorProps {
   content?: string;
   editable?: boolean;
   onUpdate?: (content: string) => void;
+  /** Collaborative mode props */
+  yjsDoc?: Y.Doc;
+  awareness?: Awareness;
+  user?: { name: string; color: string };
 }
 
-export function Editor({ content = '', editable = true, onUpdate }: EditorProps) {
+export function Editor({
+  content = '',
+  editable = true,
+  onUpdate,
+  yjsDoc,
+  awareness,
+  user,
+}: EditorProps) {
   const editor = useDocumentEditor({
     content,
     editable,
     onUpdate,
+    yjsDoc,
+    awareness,
+    user,
   });
 
   return (

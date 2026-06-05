@@ -1,26 +1,9 @@
-import { auth } from '@/lib/auth';
-import { NextResponse } from 'next/server';
+import { type NextRequest } from 'next/server';
+import { updateSession } from '@/utils/supabase/middleware';
 
-export default auth((req) => {
-  const { pathname } = req.nextUrl;
-
-  // Public routes — no auth required
-  const publicRoutes = ['/', '/signin', '/api/auth'];
-  const isPublicRoute = publicRoutes.some((route) => pathname.startsWith(route));
-  if (isPublicRoute) return NextResponse.next();
-
-  // Protected routes — require auth
-  const protectedRoutes = ['/dashboard', '/d/', '/settings', '/trash'];
-  const isProtectedRoute = protectedRoutes.some((route) => pathname.startsWith(route));
-
-  if (isProtectedRoute && !req.auth) {
-    const signInUrl = new URL('/signin', req.nextUrl.origin);
-    signInUrl.searchParams.set('callbackUrl', pathname);
-    return NextResponse.redirect(signInUrl);
-  }
-
-  return NextResponse.next();
-});
+export async function middleware(request: NextRequest) {
+  return await updateSession(request);
+}
 
 export const config = {
   matcher: [

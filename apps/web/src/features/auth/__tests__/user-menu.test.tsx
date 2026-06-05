@@ -2,10 +2,30 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import { describe, test, expect, vi } from 'vitest';
 import { UserMenu } from '../components/user-menu';
 
-vi.mock('next-auth/react', () => {
+const mockSignOut = vi.fn().mockResolvedValue({});
+const mockPush = vi.fn();
+
+vi.mock('@/features/auth/hooks/use-session', () => {
   return {
-    signOut: vi.fn(),
-    useSession: vi.fn(),
+    useTypedSession: vi.fn(),
+  };
+});
+
+vi.mock('@/utils/supabase/client', () => {
+  return {
+    createClient: vi.fn(() => ({
+      auth: {
+        signOut: mockSignOut,
+      },
+    })),
+  };
+});
+
+vi.mock('next/navigation', () => {
+  return {
+    useRouter: () => ({
+      push: mockPush,
+    }),
   };
 });
 
@@ -34,30 +54,33 @@ vi.mock('@/components/ui/avatar', () => {
   };
 });
 
-import { useSession, signOut } from 'next-auth/react';
+import { useTypedSession } from '@/features/auth/hooks/use-session';
 
 describe('UserMenu', () => {
   test('returns null when not authenticated', () => {
-    vi.mocked(useSession).mockReturnValue({
+    vi.mocked(useTypedSession).mockReturnValue({
+      user: undefined,
+      isAuthenticated: false,
+      isLoading: false,
       data: null,
-      status: 'unauthenticated',
-    } as any);
+    });
 
     const { container } = render(<UserMenu />);
     expect(container.firstChild).toBeNull();
   });
 
   test('renders user avatar when authenticated', () => {
-    vi.mocked(useSession).mockReturnValue({
-      data: {
-        user: {
-          name: 'Jane Doe',
-          email: 'jane@example.com',
-          image: 'https://example.com/jane.png',
-        },
+    vi.mocked(useTypedSession).mockReturnValue({
+      user: {
+        id: 'user-1',
+        name: 'Jane Doe',
+        email: 'jane@example.com',
+        image: 'https://example.com/jane.png',
       },
-      status: 'authenticated',
-    } as any);
+      isAuthenticated: true,
+      isLoading: false,
+      data: {} as any,
+    });
 
     render(<UserMenu />);
 
@@ -68,16 +91,17 @@ describe('UserMenu', () => {
   });
 
   test('renders user name and email inside dropdown', () => {
-    vi.mocked(useSession).mockReturnValue({
-      data: {
-        user: {
-          name: 'Jane Doe',
-          email: 'jane@example.com',
-          image: 'https://example.com/jane.png',
-        },
+    vi.mocked(useTypedSession).mockReturnValue({
+      user: {
+        id: 'user-1',
+        name: 'Jane Doe',
+        email: 'jane@example.com',
+        image: 'https://example.com/jane.png',
       },
-      status: 'authenticated',
-    } as any);
+      isAuthenticated: true,
+      isLoading: false,
+      data: {} as any,
+    });
 
     render(<UserMenu />);
 
@@ -85,23 +109,25 @@ describe('UserMenu', () => {
     expect(screen.getByText('jane@example.com')).toBeDefined();
   });
 
-  test('calls signOut when clicking sign out button', () => {
-    vi.mocked(useSession).mockReturnValue({
-      data: {
-        user: {
-          name: 'Jane Doe',
-          email: 'jane@example.com',
-          image: 'https://example.com/jane.png',
-        },
+  test('calls signOut and router.push when clicking sign out button', async () => {
+    vi.mocked(useTypedSession).mockReturnValue({
+      user: {
+        id: 'user-1',
+        name: 'Jane Doe',
+        email: 'jane@example.com',
+        image: 'https://example.com/jane.png',
       },
-      status: 'authenticated',
-    } as any);
+      isAuthenticated: true,
+      isLoading: false,
+      data: {} as any,
+    });
 
     render(<UserMenu />);
 
     const signOutBtn = screen.getByText('Sign out');
-    fireEvent.click(signOutBtn);
+    await fireEvent.click(signOutBtn);
 
-    expect(signOut).toHaveBeenCalledWith({ callbackUrl: '/signin' });
+    expect(mockSignOut).toHaveBeenCalled();
+    expect(mockPush).toHaveBeenCalledWith('/signin');
   });
 });

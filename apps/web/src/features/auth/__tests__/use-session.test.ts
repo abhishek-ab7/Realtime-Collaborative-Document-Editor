@@ -1,28 +1,32 @@
 import { describe, test, expect, vi } from 'vitest';
 import { useTypedSession } from '../hooks/use-session';
 
-vi.mock('next-auth/react', () => {
+vi.mock('@/components/providers/session-provider', () => {
   return {
-    useSession: vi.fn(),
+    useAuth: vi.fn(),
   };
 });
 
-import { useSession } from 'next-auth/react';
+import { useAuth } from '@/components/providers/session-provider';
 
 describe('useTypedSession', () => {
   test('returns typed user and status when authenticated', () => {
-    const mockSession = {
-      data: {
-        user: {
-          id: 'user-1',
-          name: 'Alice',
-          email: 'alice@example.com',
-          image: 'https://example.com/alice.png',
+    const mockAuthValue = {
+      session: {
+        access_token: 'token-abc',
+        expires_at: 1234567,
+      },
+      user: {
+        id: 'user-1',
+        email: 'alice@example.com',
+        user_metadata: {
+          full_name: 'Alice',
+          avatar_url: 'https://example.com/alice.png',
         },
       },
-      status: 'authenticated',
+      isLoading: false,
     };
-    vi.mocked(useSession).mockReturnValue(mockSession as any);
+    vi.mocked(useAuth).mockReturnValue(mockAuthValue as any);
 
     const result = useTypedSession();
 
@@ -37,11 +41,12 @@ describe('useTypedSession', () => {
   });
 
   test('returns loading state', () => {
-    const mockSession = {
-      data: null,
-      status: 'loading',
+    const mockAuthValue = {
+      session: null,
+      user: null,
+      isLoading: true,
     };
-    vi.mocked(useSession).mockReturnValue(mockSession as any);
+    vi.mocked(useAuth).mockReturnValue(mockAuthValue as any);
 
     const result = useTypedSession();
 
@@ -51,11 +56,12 @@ describe('useTypedSession', () => {
   });
 
   test('returns unauthenticated state', () => {
-    const mockSession = {
-      data: null,
-      status: 'unauthenticated',
+    const mockAuthValue = {
+      session: null,
+      user: null,
+      isLoading: false,
     };
-    vi.mocked(useSession).mockReturnValue(mockSession as any);
+    vi.mocked(useAuth).mockReturnValue(mockAuthValue as any);
 
     const result = useTypedSession();
 
