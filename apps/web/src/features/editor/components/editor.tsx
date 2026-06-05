@@ -36,7 +36,7 @@ export function Editor({
   });
 
   return (
-    <div className="flex flex-col" data-testid="editor-container">
+    <div className="flex h-full flex-col" data-testid="editor-container">
       {editable && <EditorToolbar editor={editor} />}
 
       <div className="flex-1 overflow-auto">

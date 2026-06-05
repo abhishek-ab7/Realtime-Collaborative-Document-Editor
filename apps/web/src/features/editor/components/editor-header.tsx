@@ -10,6 +10,7 @@ import { toast } from 'sonner';
 import { PresenceAvatars } from '@/features/collaboration/components/presence-avatars';
 import { TypingIndicator } from '@/features/collaboration/components/typing-indicator';
 import { SaveStatus } from '@/features/editor/components/save-status';
+import { ConnectionStatus } from '@/features/collaboration/components/connection-status';
 
 interface EditorHeaderProps {
   documentId: string;
@@ -100,6 +101,7 @@ export function EditorHeader({
             </button>
           )}
 
+          <ConnectionStatus />
           <SaveStatus />
           <TypingIndicator />
         </div>

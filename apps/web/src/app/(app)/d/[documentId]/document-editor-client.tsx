@@ -108,12 +108,6 @@ function CollaborativeEditor({
       {/* Offline warning banner */}
       {isOffline && <OfflineBanner />}
 
-      {/* Sub-header: connection status + save status */}
-      <div className="flex items-center justify-between border-b border-[#f1f5f9] px-4 py-1">
-        <ConnectionStatus />
-        <SaveStatus />
-      </div>
-
       <main className="relative flex flex-1 overflow-hidden">
         <div className="mx-auto w-full max-w-5xl flex-1">
           <Editor

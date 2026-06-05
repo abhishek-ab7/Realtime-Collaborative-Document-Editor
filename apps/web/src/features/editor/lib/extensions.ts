@@ -43,8 +43,11 @@ export function getEditorExtensions(options?: ExtensionOptions) {
         keepMarks: true,
         keepAttributes: false,
       },
+      link: false,
+      underline: false,
+      horizontalRule: false,
       // Disable history in collab mode — Yjs provides its own undo manager
-      ...(options?.yjsDoc ? { history: false } : {}),
+      ...(options?.yjsDoc ? { undoRedo: false } : {}),
     }),
     Placeholder.configure({
       placeholder: 'Start writing...',
