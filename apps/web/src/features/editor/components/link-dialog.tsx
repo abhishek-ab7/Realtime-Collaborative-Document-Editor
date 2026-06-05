@@ -22,7 +22,10 @@ export function LinkDialog({ open, onOpenChange, initialUrl = '', onConfirm }: L
   const [url, setUrl] = useState(initialUrl);
 
   useEffect(() => {
-    if (open) setUrl(initialUrl);
+    if (open) {
+      const timer = setTimeout(() => setUrl(initialUrl), 0);
+      return () => clearTimeout(timer);
+    }
   }, [open, initialUrl]);
 
   const handleSubmit = (e: React.FormEvent) => {

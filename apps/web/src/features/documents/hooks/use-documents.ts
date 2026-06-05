@@ -88,7 +88,8 @@ export function useDocuments(initialOptions: FetchDocumentsOptions = {}) {
   }, [options]);
 
   useEffect(() => {
-    fetchDocuments();
+    const timer = setTimeout(() => fetchDocuments(), 0);
+    return () => clearTimeout(timer);
   }, [fetchDocuments]);
 
   const setPage = useCallback((page: number) => {
