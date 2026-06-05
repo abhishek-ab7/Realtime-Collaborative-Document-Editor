@@ -199,14 +199,14 @@ export default async function Home() {
                   , we construct a mathematically guaranteed convergence model.
                 </p>
                 <div className="relative mb-4 rounded-r-lg border-l-4 border-indigo-500 bg-slate-50 p-4 font-sans text-sm text-slate-600 dark:bg-slate-950 dark:text-slate-400">
-                  "The best collaborative experiences feel indistinguishable from editing a local
-                  file."
+                  &quot;The best collaborative experiences feel indistinguishable from editing a
+                  local file.&quot;
                 </div>
 
                 {/* Simulated Cursors */}
                 <p className="relative text-base">
                   Every user interaction is serialized into binary updates and broadcast over secure
-                  WebSockets. Cursors represent real-time focus positions. Let's make sure the
+                  WebSockets. Cursors represent real-time focus positions. Let&apos;s make sure the
                   {/* Cursor 1: Sarah */}
                   <span className="relative inline-block border-b-2 border-emerald-500 bg-emerald-500/20 px-0.5">
                     sync architecture scales horizontally

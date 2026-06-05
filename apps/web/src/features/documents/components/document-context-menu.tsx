@@ -157,8 +157,8 @@ export function DocumentContextMenu({
           <DialogHeader>
             <DialogTitle>Delete permanently</DialogTitle>
             <DialogDescription>
-              Are you sure you want to permanently delete "{currentTitle}"? This action cannot be
-              undone.
+              Are you sure you want to permanently delete &quot;{currentTitle}&quot;? This action
+              cannot be undone.
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { render, screen, fireEvent } from '@testing-library/react';
 import { describe, test, expect, vi } from 'vitest';
 import { UserMenu } from '../components/user-menu';
@@ -49,6 +50,7 @@ vi.mock('@/components/ui/dropdown-menu', () => {
 vi.mock('@/components/ui/avatar', () => {
   return {
     Avatar: ({ children }: any) => <div data-testid="avatar">{children}</div>,
+
     AvatarImage: ({ src, alt }: any) => <img src={src} alt={alt} />,
     AvatarFallback: ({ children }: any) => <span>{children}</span>,
   };

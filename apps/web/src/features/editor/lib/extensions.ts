@@ -76,14 +76,17 @@ export function getEditorExtensions(options?: ExtensionOptions) {
     extensions.push(
       Collaboration.configure({
         document: options.yjsDoc,
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
       }) as any,
     );
 
     if (options?.awareness && options?.user) {
       extensions.push(
         CollaborationCursor.configure({
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           provider: { awareness: options.awareness } as any,
           user: options.user,
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
         }) as any,
       );
     }

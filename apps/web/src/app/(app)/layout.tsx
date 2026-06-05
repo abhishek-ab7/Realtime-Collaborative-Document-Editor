@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { UserMenu } from '@/features/auth/components/user-menu';
-import { FileText, Trash2, Home, Settings } from 'lucide-react';
+import { Trash2, Home, Settings } from 'lucide-react';
 import { auth } from '@/lib/auth';
 import { redirect } from 'next/navigation';
 

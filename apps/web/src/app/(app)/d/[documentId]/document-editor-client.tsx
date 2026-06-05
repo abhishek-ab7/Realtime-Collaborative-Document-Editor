@@ -1,6 +1,5 @@
 'use client';
 
-import { useState, useCallback, useRef } from 'react';
 import { Editor } from '@/features/editor/components/editor';
 import { EditorHeader } from '@/features/editor/components/editor-header';
 import {
@@ -8,9 +7,7 @@ import {
   useCollaborationContext,
 } from '@/features/collaboration/providers/collaboration-provider';
 import { ConnectionStatus } from '@/features/collaboration/components/connection-status';
-import { updateDocument } from '@/features/documents/actions/document-actions';
 import { PRESENCE_COLORS } from '@collabdoc/shared';
-import { toast } from 'sonner';
 
 interface DocumentEditorClientProps {
   documentId: string;
@@ -32,7 +29,7 @@ function CollaborativeEditor({
   userName: string;
   userId: string;
 }) {
-  const { doc, awareness, connectionStatus, isSynced, saveStatus } = useCollaborationContext();
+  const { doc, awareness, saveStatus } = useCollaborationContext();
 
   // Deterministic color assignment based on userId
   const colorIndex =
@@ -41,14 +38,6 @@ function CollaborativeEditor({
 
   const isSaving = saveStatus === 'saving';
   const lastSavedAt = saveStatus === 'saved' ? new Date() : null;
-
-  const handleTitleUpdate = useCallback(async () => {
-    try {
-      await updateDocument(documentId, {});
-    } catch {
-      toast.error('Failed to save document');
-    }
-  }, [documentId]);
 
   // Show loading state until synced
   if (!doc) {
@@ -94,8 +83,6 @@ function CollaborativeEditor({
 export function DocumentEditorClient({
   documentId,
   title,
-  content,
-  lastAccessedAt,
   userName,
   userId,
 }: DocumentEditorClientProps) {

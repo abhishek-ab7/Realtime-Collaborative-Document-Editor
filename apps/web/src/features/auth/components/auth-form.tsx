@@ -45,9 +45,9 @@ export function AuthForm({ view, callbackUrl = '/dashboard' }: AuthFormProps) {
         if (error) throw error;
         router.push(callbackUrl);
       }
-    } catch (err: any) {
+    } catch (err) {
       console.error('Auth error:', err);
-      setError(err.message || 'Authentication failed');
+      setError((err as Error).message || 'Authentication failed');
     } finally {
       setIsLoading(false);
     }
@@ -64,9 +64,9 @@ export function AuthForm({ view, callbackUrl = '/dashboard' }: AuthFormProps) {
         },
       });
       if (error) throw error;
-    } catch (err: any) {
+    } catch (err) {
       console.error('Google sign-in error:', err);
-      setError(err.message || 'Google sign-in failed');
+      setError((err as Error).message || 'Google sign-in failed');
       setIsLoading(false);
     }
   };

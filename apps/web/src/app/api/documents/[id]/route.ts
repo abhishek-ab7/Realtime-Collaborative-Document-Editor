@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/lib/auth';
 import { prisma } from '@collabdoc/database';
-import { updateDocumentSchema } from '@collabdoc/shared';
 import { updateDocument, deleteDocument } from '@/features/documents/actions/document-actions';
 
 // GET /api/documents/[id] — Retrieve a single document

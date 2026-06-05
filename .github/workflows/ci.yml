@@ -63,8 +63,23 @@ jobs:
 
       - name: Build
         run: npm run build
+        env:
+          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 
       - name: Run Unit & Integration Tests
-        run: npm run test
+        run: npm run test:coverage
         env:
           DATABASE_URL: postgresql://collabdoc:collabdoc_dev_password@localhost:5432/collabdoc?schema=public
+
+      - name: Upload coverage reports to Codecov
+        uses: codecov/codecov-action@v5
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          slug: abhishek-ab7/Realtime-Collaborative-Document-Editor
+
+      - name: Upload test results to Codecov
+        if: ${{ !cancelled() }}
+        uses: codecov/test-results-action@v1
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          slug: abhishek-ab7/Realtime-Collaborative-Document-Editor

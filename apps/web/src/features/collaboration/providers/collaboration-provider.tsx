@@ -1,6 +1,14 @@
 'use client';
 
-import { createContext, useContext, useEffect, useRef, useState, type ReactNode } from 'react';
+import {
+  createContext,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+  useCallback,
+  type ReactNode,
+} from 'react';
 import * as Y from 'yjs';
 import type { Awareness } from 'y-protocols/awareness';
 import { SocketIOProvider, type ConnectionStatus } from '@collabdoc/yjs-utils';
@@ -43,16 +51,18 @@ export function CollaborationProvider({ documentId, children }: CollaborationPro
     Array<{ userId: string; name: string; avatarUrl: string | null }>
   >([]);
 
+  // Use state instead of refs for values consumed during render
+  const [doc, setDoc] = useState<Y.Doc | null>(null);
+  const [provider, setProvider] = useState<SocketIOProvider | null>(null);
+  const [awareness, setAwareness] = useState<Awareness | null>(null);
+
+  // Keep refs for cleanup only
   const docRef = useRef<Y.Doc | null>(null);
   const providerRef = useRef<SocketIOProvider | null>(null);
-  const awarenessRef = useRef<Awareness | null>(null);
-
-  // Use a ref to force re-render when doc is ready
-  const [, setReady] = useState(0);
 
   useEffect(() => {
     let mounted = true;
-    let provider: SocketIOProvider | null = null;
+    let localProvider: SocketIOProvider | null = null;
 
     async function init() {
       // 1. Generate auth token
@@ -60,40 +70,39 @@ export function CollaborationProvider({ documentId, children }: CollaborationPro
       if (!token || !mounted) return;
 
       // 2. Create Y.Doc
-      const doc = new Y.Doc();
-      docRef.current = doc;
+      const newDoc = new Y.Doc();
+      docRef.current = newDoc;
 
       // 3. Create provider
       const socketUrl = process.env.NEXT_PUBLIC_SOCKET_URL || 'http://localhost:3001';
-      provider = new SocketIOProvider(socketUrl, documentId, doc, {
+      localProvider = new SocketIOProvider(socketUrl, documentId, newDoc, {
         authToken: token,
         autoConnect: true,
       });
 
-      providerRef.current = provider;
-      awarenessRef.current = provider.awareness;
+      providerRef.current = localProvider;
 
       // 4. Listen for events
-      provider.on('status', ([status]: [ConnectionStatus]) => {
+      localProvider.on('status', ([status]: [ConnectionStatus]) => {
         if (mounted) setConnectionStatus(status);
       });
 
-      provider.on('sync', ([synced]: [boolean]) => {
+      localProvider.on('sync', ([synced]: [boolean]) => {
         if (mounted) setIsSynced(synced);
       });
 
-      provider.on('save-status', ([status]: [string]) => {
+      localProvider.on('save-status', ([status]: [string]) => {
         if (mounted) setSaveStatus(status as 'saving' | 'saved' | 'error');
       });
 
-      provider.on(
+      localProvider.on(
         'users',
         ([users]: [Array<{ userId: string; name: string; avatarUrl: string | null }>]) => {
           if (mounted) setConnectedUsers(users);
         },
       );
 
-      provider.on(
+      localProvider.on(
         'user-joined',
         ([user]: [{ userId: string; name: string; avatarUrl: string | null }]) => {
           if (mounted) {
@@ -106,41 +115,48 @@ export function CollaborationProvider({ documentId, children }: CollaborationPro
         },
       );
 
-      provider.on('user-left', ([user]: [{ userId: string; name: string }]) => {
+      localProvider.on('user-left', ([user]: [{ userId: string; name: string }]) => {
         if (mounted) {
           setConnectedUsers((prev) => prev.filter((u) => u.userId !== user.userId));
         }
       });
 
-      // Trigger re-render so context consumers get the doc
-      if (mounted) setReady((r) => r + 1);
+      // Update state for render consumption
+      if (mounted) {
+        setDoc(newDoc);
+        setProvider(localProvider);
+        setAwareness(localProvider.awareness);
+      }
     }
 
     init();
 
     return () => {
       mounted = false;
-      provider?.destroy();
+      providerRef.current?.destroy();
       docRef.current?.destroy();
+      setDoc(null);
+      setProvider(null);
+      setAwareness(null);
       docRef.current = null;
       providerRef.current = null;
-      awarenessRef.current = null;
     };
   }, [documentId]);
 
+  const contextValue = useCallback(
+    () => ({
+      doc,
+      provider,
+      awareness,
+      connectionStatus,
+      isSynced,
+      saveStatus,
+      connectedUsers,
+    }),
+    [doc, provider, awareness, connectionStatus, isSynced, saveStatus, connectedUsers],
+  );
+
   return (
-    <CollaborationContext.Provider
-      value={{
-        doc: docRef.current,
-        provider: providerRef.current,
-        awareness: awarenessRef.current,
-        connectionStatus,
-        isSynced,
-        saveStatus,
-        connectedUsers,
-      }}
-    >
-      {children}
-    </CollaborationContext.Provider>
+    <CollaborationContext.Provider value={contextValue()}>{children}</CollaborationContext.Provider>
   );
 }

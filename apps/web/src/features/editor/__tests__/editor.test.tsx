@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { render, screen } from '@testing-library/react';
 import { describe, test, expect, vi, beforeEach } from 'vitest';
 
@@ -62,8 +63,9 @@ describe('Editor', () => {
 
   test('calls onUpdate when content changes', () => {
     const onUpdate = vi.fn();
-    vi.mocked(useDocumentEditor).mockImplementation(({ onUpdate: cb } = {}) => {
+    vi.mocked(useDocumentEditor).mockImplementation(({ onUpdate } = {}) => {
       // Simulate calling onUpdate
+      if (onUpdate) onUpdate();
       return null as any;
     });
 

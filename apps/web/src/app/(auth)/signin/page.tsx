@@ -63,7 +63,7 @@ export default async function SignInPage({ searchParams }: SignInPageProps) {
         <AuthForm view="signin" callbackUrl={params.callbackUrl} />
 
         <p className="mt-4 text-sm text-[var(--color-text-secondary)]">
-          Don't have an account?{' '}
+          Don&apos;t have an account?{' '}
           <Link
             href="/signup"
             className="font-medium text-[var(--color-brand-primary)] hover:underline"

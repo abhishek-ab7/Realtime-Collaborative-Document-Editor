@@ -1,10 +1,11 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { describe, test, expect, vi, beforeEach } from 'vitest';
 import {
   createDocument,
   updateDocument,
   deleteDocument,
   duplicateDocument,
-  searchDocuments,
+  duplicateDocument,
 } from '../actions/document-actions';
 
 vi.mock('@/lib/auth', () => {
