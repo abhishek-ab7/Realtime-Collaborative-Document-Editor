@@ -17,11 +17,18 @@
       "dependsOn": ["^build"]
     },
     "test": {
-      "dependsOn": ["^build"]
+      "dependsOn": ["^build"],
+      "env": ["DATABASE_URL", "NEXT_PUBLIC_SUPABASE_URL", "NEXT_PUBLIC_SUPABASE_ANON_KEY"]
     },
     "test:coverage": {
       "dependsOn": ["^build"],
-      "outputs": ["coverage/**", "test-report.junit.xml"]
+      "outputs": ["coverage/**", "test-report.junit.xml"],
+      "env": [
+        "DATABASE_URL",
+        "NEXT_PUBLIC_SUPABASE_URL",
+        "NEXT_PUBLIC_SUPABASE_ANON_KEY",
+        "CODECOV_TOKEN"
+      ]
     }
   }
 }
