@@ -12,6 +12,10 @@ import {
 import { ConnectionStatus } from '@/features/collaboration/components/connection-status';
 import { usePresence } from '@/features/collaboration/hooks/use-presence';
 import { PRESENCE_COLORS } from '@collabdoc/shared';
+import { useVersions, VersionItem } from '@/features/editor/hooks/use-versions';
+import { VersionPanel } from '@/features/editor/components/version-history/version-panel';
+import { VersionDiffViewer } from '@/features/editor/components/version-history/version-diff';
+import { useState } from 'react';
 
 interface DocumentEditorClientProps {
   documentId: string;
@@ -39,10 +43,13 @@ function CollaborativeEditor({
   const { doc, awareness, saveStatus, connectionStatus } = useCollaborationContext();
   const { setLocalUser } = usePresence();
 
-  // Deterministic color from userId hash
   const colorIndex =
     userId.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0) % PRESENCE_COLORS.length;
   const userColor = PRESENCE_COLORS[colorIndex];
+
+  // Versions State
+  const versionsHook = useVersions(documentId);
+  const [diffVersion, setDiffVersion] = useState<VersionItem | null>(null);
 
   // Push local user info into awareness once connected
   useEffect(() => {
@@ -64,6 +71,15 @@ function CollaborativeEditor({
     return () => window.removeEventListener('beforeunload', handleBeforeUnload);
   }, [saveStatus]);
 
+  // Listen for open-diff-viewer event
+  useEffect(() => {
+    const handleOpenDiff = (e: CustomEvent<VersionItem>) => {
+      setDiffVersion(e.detail);
+    };
+    window.addEventListener('open-diff-viewer', handleOpenDiff as EventListener);
+    return () => window.removeEventListener('open-diff-viewer', handleOpenDiff as EventListener);
+  }, []);
+
   const isOffline = connectionStatus === 'disconnected';
 
   // Loading state until socket sync
@@ -83,7 +99,11 @@ function CollaborativeEditor({
 
   return (
     <div className="flex min-h-screen flex-col bg-white">
-      <EditorHeader documentId={documentId} title={title} />
+      <EditorHeader
+        documentId={documentId}
+        title={title}
+        onOpenHistory={versionsHook.togglePanel}
+      />
 
       {/* Offline warning banner */}
       {isOffline && <OfflineBanner />}
@@ -94,8 +114,8 @@ function CollaborativeEditor({
         <SaveStatus />
       </div>
 
-      <main className="flex-1">
-        <div className="mx-auto max-w-5xl">
+      <main className="relative flex flex-1 overflow-hidden">
+        <div className="mx-auto w-full max-w-5xl flex-1">
           <Editor
             editable={true}
             yjsDoc={doc}
@@ -103,7 +123,24 @@ function CollaborativeEditor({
             user={{ name: userName, color: userColor }}
           />
         </div>
+
+        <VersionPanel
+          documentId={documentId}
+          isOpen={versionsHook.isOpen}
+          onClose={() => versionsHook.setIsOpen(false)}
+          versions={versionsHook.versions}
+          isLoading={versionsHook.isLoading}
+          onCreateManualVersion={versionsHook.createManualVersion}
+          onRestoreVersion={versionsHook.restoreVersion}
+        />
       </main>
+
+      <VersionDiffViewer
+        documentId={documentId}
+        version={diffVersion}
+        onClose={() => setDiffVersion(null)}
+        onRestore={versionsHook.restoreVersion}
+      />
     </div>
   );
 }

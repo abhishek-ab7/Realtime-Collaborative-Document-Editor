@@ -3,13 +3,21 @@ import { codecovNextJSWebpackPlugin } from '@codecov/nextjs-webpack-plugin';
 
 const nextConfig: NextConfig = {
   transpilePackages: ['@collabdoc/database', '@collabdoc/shared', '@collabdoc/yjs-utils'],
-  turbopack: {},
+  turbopack: {
+    resolveAlias: {
+      'y-prosemirror': '@tiptap/y-tiptap',
+    },
+  },
   images: {
     remotePatterns: [
       { protocol: 'https', hostname: 'lh3.googleusercontent.com' }, // Google avatars
     ],
   },
   webpack: (config, options) => {
+    config.resolve.alias = {
+      ...config.resolve.alias,
+      'y-prosemirror': '@tiptap/y-tiptap',
+    };
     config.plugins.push(
       codecovNextJSWebpackPlugin({
         enableBundleAnalysis: process.env.CODECOV_TOKEN !== undefined,

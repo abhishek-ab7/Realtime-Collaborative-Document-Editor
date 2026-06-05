@@ -1,0 +1,27 @@
+[
+  {
+    "id": "TC001",
+    "title": "GET /api/documents returns 401 Unauthorized when unauthenticated",
+    "description": "Send a GET request to /api/documents without session cookies and ensure the API returns a 401 status code with an unauthorized error."
+  },
+  {
+    "id": "TC002",
+    "title": "POST /api/documents returns 401 Unauthorized when unauthenticated",
+    "description": "Send a POST request to /api/documents with a sample payload without session cookies and ensure the API returns a 401 status code."
+  },
+  {
+    "id": "TC003",
+    "title": "GET /api/documents/123 returns 401 Unauthorized when unauthenticated",
+    "description": "Send a GET request to /api/documents/123 without session cookies and ensure it returns a 401 status code."
+  },
+  {
+    "id": "TC004",
+    "title": "PATCH /api/documents/123 returns 401 Unauthorized when unauthenticated",
+    "description": "Send a PATCH request to /api/documents/123 with a title update payload without session cookies and ensure it returns a 401 status code."
+  },
+  {
+    "id": "TC005",
+    "title": "DELETE /api/documents/123 returns 401 Unauthorized when unauthenticated",
+    "description": "Send a DELETE request to /api/documents/123 without session cookies and ensure it returns a 401 status code."
+  }
+]

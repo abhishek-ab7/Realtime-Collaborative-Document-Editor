@@ -88,9 +88,11 @@ export function registerRoomHandlers(io: Server, socket: Socket) {
         });
 
         // 8. Store user metadata on socket for cleanup
-        (socket as any).__rooms = (socket as any).__rooms || new Set<string>();
-        (socket as any).__rooms.add(documentId);
-        (socket as any).__role = role;
+        type SocketWithMetadata = typeof socket & { __rooms?: Set<string>; __role?: string | null };
+        const metaSocket = socket as SocketWithMetadata;
+        metaSocket.__rooms = metaSocket.__rooms || new Set<string>();
+        metaSocket.__rooms.add(documentId);
+        metaSocket.__role = role;
 
         logger.info(
           {
@@ -138,7 +140,9 @@ export function handleLeaveRoom(_io: Server, socket: Socket, documentId: string)
   }
 
   // Clean up socket metadata
-  const rooms = (socket as any).__rooms as Set<string> | undefined;
+  type SocketWithMetadata = typeof socket & { __rooms?: Set<string> };
+  const metaSocket = socket as SocketWithMetadata;
+  const rooms = metaSocket.__rooms;
   if (rooms) {
     rooms.delete(documentId);
   }

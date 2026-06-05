@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
-import { ArrowLeft, MoreHorizontal, Share2 } from 'lucide-react';
+import { ArrowLeft, MoreHorizontal, Share2, History } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { updateDocument } from '@/features/documents/actions/document-actions';
@@ -16,9 +16,14 @@ interface EditorHeaderProps {
   title: string;
   wordCount?: number;
   characterCount?: number;
+  onOpenHistory?: () => void;
 }
 
-export function EditorHeader({ documentId, title: initialTitle }: EditorHeaderProps) {
+export function EditorHeader({
+  documentId,
+  title: initialTitle,
+  onOpenHistory,
+}: EditorHeaderProps) {
   const [title, setTitle] = useState(initialTitle);
   const [isEditing, setIsEditing] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -102,6 +107,16 @@ export function EditorHeader({ documentId, title: initialTitle }: EditorHeaderPr
         {/* Right: Actions */}
         <div className="flex shrink-0 items-center gap-4">
           <PresenceAvatars />
+          {onOpenHistory && (
+            <Button
+              variant="ghost"
+              size="sm"
+              className="hidden gap-1.5 text-slate-500 hover:text-slate-900 sm:flex"
+              onClick={onOpenHistory}
+            >
+              <History className="h-4 w-4" />
+            </Button>
+          )}
           <Button
             variant="outline"
             size="sm"

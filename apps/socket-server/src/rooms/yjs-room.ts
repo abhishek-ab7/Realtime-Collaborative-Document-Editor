@@ -65,8 +65,8 @@ export class YjsRoom {
     if (user) {
       // Remove awareness for this specific client by setting their state to null
       const states = this.awareness.getStates();
-      for (const [clientId, state] of states) {
-        if ((state as any)?.socketId === socketId) {
+      for (const [, state] of states) {
+        if ((state as { socketId?: string })?.socketId === socketId) {
           this.awareness.setLocalStateField('user', null);
         }
       }

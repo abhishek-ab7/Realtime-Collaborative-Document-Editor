@@ -1,18 +1,18 @@
 # Phase 08 — Version History
 
 **Duration:** Days 29–33 (5 days)  
-**Status:** Not Started
+**Status:** Complete
 
 ## Deliverables
 
-- [ ] Automatic version creation (every 30 min of editing, on room empty)
-- [ ] Version history panel (sidebar)
-- [ ] Version preview (read-only render)
-- [ ] Version restore with confirmation dialog
-- [ ] Backup-before-restore mechanism
-- [ ] Diff view between two versions (Myers diff)
-- [ ] Editor attribution on versions
-- [ ] Snapshot garbage collection (keep last 50)
+- [x] Automatic version creation (every 30 min of editing, on room empty)
+- [x] Version history panel (sidebar)
+- [x] Version preview (read-only render)
+- [x] Version restore with confirmation dialog
+- [x] Backup-before-restore mechanism
+- [x] Diff view between two versions (Myers diff)
+- [x] Editor attribution on versions
+- [x] Snapshot garbage collection (keep last 50)
 
 ## Files to Create/Modify
 
@@ -35,11 +35,11 @@
 
 ## Acceptance Criteria
 
-- [ ] All files from "Files to Create/Modify" exist
-- [ ] TypeScript strict mode passes (0 errors)
-- [ ] All tests for this phase pass
-- [ ] Code follows patterns from [[05-reference-code/yjs-patterns|Yjs Patterns]]
-- [ ] Reverts restore vectors correctly with backups
+- [x] All files from "Files to Create/Modify" exist
+- [x] TypeScript strict mode passes (0 errors)
+- [x] All tests for this phase pass
+- [x] Code follows patterns from [[05-reference-code/yjs-patterns|Yjs Patterns]]
+- [x] Reverts restore vectors correctly with backups
 
 ## Dependencies
 

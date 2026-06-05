@@ -12,6 +12,7 @@ jobs:
     env:
       NEXT_PUBLIC_SUPABASE_URL: https://trjloubazxygxfhxbtey.supabase.co
       NEXT_PUBLIC_SUPABASE_ANON_KEY: sb_publishable_M8r81tkCGqXhkf4ma5KuyA_mUizXIQZ
+      TESTSPRITE_API_KEY: ${{ secrets.TESTSPRITE_API_KEY }}
 
     services:
       postgres:
@@ -86,3 +87,29 @@ jobs:
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           slug: abhishek-ab7/Realtime-Collaborative-Document-Editor
+
+#       - name: Install Playwright Browsers
+#         run: npx playwright install --with-deps
+#
+#       - name: Run Playwright E2E Tests
+#         run: npm run test:e2e
+#         env:
+#           DATABASE_URL: postgresql://collabdoc:collabdoc_dev_password@localhost:5432/collabdoc?schema=public
+
+      - name: Run TestSprite Automated Testing
+        if: ${{ env.TESTSPRITE_API_KEY != '' }}
+        env:
+          API_KEY: ${{ secrets.TESTSPRITE_API_KEY }}
+          DATABASE_URL: postgresql://collabdoc:collabdoc_dev_password@localhost:5432/collabdoc?schema=public
+        run: |
+          npm run dev &
+          echo "Waiting for localhost:3000 to be active..."
+          for i in {1..30}; do
+            if curl -s http://localhost:3000 > /dev/null; then
+              echo "Server is ready!"
+              break
+            fi
+            sleep 2
+          done
+          npx @testsprite/testsprite-mcp@latest generateCodeAndExecute
+

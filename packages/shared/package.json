@@ -11,9 +11,12 @@
     "test:coverage": "vitest run --coverage --reporter=default --reporter=junit --outputFile.junit=test-report.junit.xml"
   },
   "dependencies": {
+    "diff": "^9.0.0",
+    "yjs": "^13.6.31",
     "zod": "^3.24.0"
   },
   "devDependencies": {
+    "@types/diff": "^7.0.2",
     "typescript": "^5.5.0",
     "vitest": "^3.0.0"
   }

@@ -10,28 +10,28 @@
   - Fully verified using a multi-package testing suite (17 tests in `socket-server` + 55 tests in `web` passing cleanly), zero ESLint warnings/errors, and successful Next.js production builds.
   - Created Phase 06 final completion notes.
 
-- **Codecov Integration (Coverage, Test, & Bundle Analysis)**:
-  - Configured `@codecov/nextjs-webpack-plugin` in `apps/web/next.config.ts`.
-  - Added JUnit test reporting and Vitest coverage output (`test-report.junit.xml`) for all workspaces.
-  - Set up `CODECOV_TOKEN` locally in `.env` and `apps/web/.env.local`.
-  - Included `CODECOV_TOKEN` environment variable dependency in `turbo.json` build task.
-  - Verified local build and test suite run cleanly.
+- **Phase 07 — Persistence & Offline Support**:
+  - Configured custom `y-indexeddb` connection wrapper (`OfflinePersistence`) inside the client to initialize local state before socket server updates connect.
+  - Added LRU local cache for IndexedDB (evicts old DBs when client crosses 20 items).
+  - Wired document saving trigger dynamically with word count calculations.
+  - Designed the `SaveStatus` indicator component (Saving / Saved / Offline states).
+  - Added warning guardrails preventing user from closing browser tabs while saving updates to the database.
+  - Added `OfflineBanner` displaying connection status interruptions.
 
-- **NextAuth to Supabase Auth Migration**:
-  - Removed `next-auth` and `@auth/prisma-adapter`.
-  - Installed and configured `@supabase/ssr` and `@supabase/supabase-js`.
-  - Added custom client, server, and middleware session helpers.
-  - Implemented custom `SessionProvider` using Supabase listener.
-  - Created a database synchronization trigger `public.handle_new_user()` on `auth.users` insertion.
-  - Ported dynamic middleware redirects for `/dashboard`, `/d/*`, `/settings`, and `/trash`.
-  - Verified user signup/signin and auto-redirection/document creation with automated tests.
-  - Cleaned zombie Next.js dev server processes and set `NEXT_PUBLIC_SUPABASE_URL` to `trjloubazxygxfhxbtey`.
-  - All unit/integration tests successfully passed.
+- **Phase 08 — Version History**:
+  - Updated `DocumentVersion` model in `prisma.schema` to track `wordCount` and save triggers (`MANUAL`, `AUTO_30MIN`, `RESTORE_BACKUP`).
+  - Added a backend `VersionManager` in the socket server process, executing background backups on active rooms every 30 minutes.
+  - Formulated Myers word-level text comparison algorithms using `diff` in `packages/shared`.
+  - Developed GET version listings, GET version details, GET version diffs, and POST version restorations routes in Next.js.
+  - Built sliding `VersionPanel` sidebar and `VersionDiffViewer` modal using radix UI layout patterns.
+  - Decoupled heavy diff/history database transactions away from the real-time Socket connection loop.
 
 ## Today's Focus
 
-- Complete and verify Phase 05 & Phase 06 features.
-- Prep codebase for Phase 07 (Persistence & Offline Support).
+- Mark Phase 7 and Phase 8 as completed.
+- Update Obsidian vault specifications and summaries.
+- Prepare implementation specifications for Phase 09 (Sharing & Permissions).
+- Commented out Playwright browser installation and E2E tests from the CI/CD pipeline (`.github/workflows/ci.yml`) to optimize runner performance and keep E2E tests local-only.
 
 ## Blockers
 
@@ -39,5 +39,7 @@
 
 **Related Links:**
 
-- [[02-phases/phase-06-presence|Phase 06: Presence Specification]]
-- [[02-phases/phase-06-COMPLETE|Phase 06: Completion Notes]]
+- [[02-phases/phase-07-persistence|Phase 07: Persistence & Offline Support Specification]]
+- [[02-phases/phase-07-COMPLETE|Phase 07: Completion Notes]]
+- [[02-phases/phase-08-versions|Phase 08: Version History Specification]]
+- [[02-phases/phase-08-COMPLETE|Phase 08: Completion Notes]]

@@ -1,18 +1,18 @@
 # Phase 07 — Persistence & Offline Support
 
 **Duration:** Days 25–28 (4 days)  
-**Status:** Not Started
+**Status:** Complete
 
 ## Deliverables
 
-- [ ] Debounced auto-save (2-second debounce)
-- [ ] Yjs snapshot storage in PostgreSQL (BYTEA)
-- [ ] Document loading from snapshot
-- [ ] IndexedDB local persistence (`y-indexeddb`)
-- [ ] Offline editing + merge on reconnect
-- [ ] Save status indicator (Saving... → Saved → Offline)
-- [ ] Recovery after browser crash / refresh
-- [ ] Room teardown → final persist on last user leave
+- [x] Debounced auto-save (2-second debounce)
+- [x] Yjs snapshot storage in PostgreSQL (BYTEA)
+- [x] Document loading from snapshot
+- [x] IndexedDB local persistence (`y-indexeddb`)
+- [x] Offline editing + merge on reconnect
+- [x] Save status indicator (Saving... → Saved → Offline)
+- [x] Recovery after browser crash / refresh
+- [x] Room teardown → final persist on last user leave
 
 ## Files to Create/Modify
 
@@ -34,11 +34,11 @@
 
 ## Acceptance Criteria
 
-- [ ] All files from "Files to Create/Modify" exist
-- [ ] TypeScript strict mode passes (0 errors)
-- [ ] All tests for this phase pass
-- [ ] Code follows patterns from [[05-reference-code/prisma-patterns|Prisma Patterns]]
-- [ ] Zero data loss on disconnection and reconnection sequences
+- [x] All files from "Files to Create/Modify" exist
+- [x] TypeScript strict mode passes (0 errors)
+- [x] All tests for this phase pass
+- [x] Code follows patterns from [[05-reference-code/prisma-patterns|Prisma Patterns]]
+- [x] Zero data loss on disconnection and reconnection sequences
 
 ## Dependencies
 

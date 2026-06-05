@@ -107,6 +107,12 @@ export class SocketIOProvider extends Observable<string> {
       this.emit('user-left', [user]);
     });
 
+    this.socket.on('force-reload', () => {
+      if (typeof window !== 'undefined') {
+        window.location.reload();
+      }
+    });
+
     // ─── Listen for local doc changes → send to server ───
     this._updateHandler = (update: Uint8Array, origin: unknown) => {
       if (origin === 'remote') return; // Don't echo back remote updates

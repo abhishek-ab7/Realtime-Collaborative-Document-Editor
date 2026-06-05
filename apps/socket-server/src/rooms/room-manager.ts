@@ -7,6 +7,7 @@ import {
   SNAPSHOT_INTERVAL_MS,
 } from '@collabdoc/shared';
 import { logger } from '../lib/logger';
+import { versionManager } from './version-manager';
 import type { Server } from 'socket.io';
 
 export class RoomManager {
@@ -47,6 +48,9 @@ export class RoomManager {
 
     // Start the periodic snapshot timer (every 5 minutes)
     this.startSnapshotTimer(documentId);
+
+    // Start periodic version history timer (every 30 minutes)
+    versionManager.startVersionTimer(documentId);
 
     this.rooms.set(documentId, room);
     logger.info({ documentId, totalRooms: this.rooms.size }, 'Room registered');
@@ -131,6 +135,9 @@ export class RoomManager {
       // Final save before teardown
       await this.saveRoom(documentId);
 
+      // Create a version snapshot on room teardown
+      await versionManager.createVersion(documentId, 'ROOM_TEARDOWN');
+
       // Clean up all timers
       const saveTimer = this.saveTimers.get(documentId);
       if (saveTimer) {
@@ -142,12 +149,35 @@ export class RoomManager {
         clearInterval(snapshotTimer);
         this.snapshotTimers.delete(documentId);
       }
+      versionManager.clearVersionTimer(documentId);
 
       room.destroy();
       this.rooms.delete(documentId);
 
       logger.info({ documentId, totalRooms: this.rooms.size }, 'Room torn down after inactivity');
     });
+  }
+
+  /** Forcefully evict a room from memory without saving (e.g. after a restore) */
+  evictRoom(documentId: string): void {
+    const room = this.rooms.get(documentId);
+    if (!room) return;
+
+    const saveTimer = this.saveTimers.get(documentId);
+    if (saveTimer) {
+      clearTimeout(saveTimer);
+      this.saveTimers.delete(documentId);
+    }
+    const snapshotTimer = this.snapshotTimers.get(documentId);
+    if (snapshotTimer) {
+      clearInterval(snapshotTimer);
+      this.snapshotTimers.delete(documentId);
+    }
+    versionManager.clearVersionTimer(documentId);
+
+    room.destroy();
+    this.rooms.delete(documentId);
+    logger.info({ documentId }, 'Room forcefully evicted');
   }
 
   /** Get stats for monitoring */
@@ -183,6 +213,9 @@ export class RoomManager {
       clearInterval(timer);
     }
     this.snapshotTimers.clear();
+
+    // Clear version timers
+    Array.from(this.rooms.keys()).forEach((id) => versionManager.clearVersionTimer(id));
   }
 }
 
