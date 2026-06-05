@@ -5,6 +5,7 @@ import { prisma } from '@collabdoc/database';
 import { canViewDocument } from '@collabdoc/shared';
 import { logger } from '../lib/logger';
 import { cleanupAwarenessThrottle } from './awareness';
+import * as Sentry from '@sentry/node';
 
 export function registerRoomHandlers(io: Server, socket: Socket) {
   const authSocket = socket as AuthenticatedSocket;
@@ -105,6 +106,7 @@ export function registerRoomHandlers(io: Server, socket: Socket) {
         );
       } catch (error) {
         logger.error({ documentId, error }, 'Error joining room');
+        Sentry.captureException(error);
         callback({ success: false, error: 'Internal error' });
       }
     },

@@ -1,5 +1,6 @@
 import type { NextConfig } from 'next';
 import { codecovNextJSWebpackPlugin } from '@codecov/nextjs-webpack-plugin';
+import { withSentryConfig } from '@sentry/nextjs';
 
 const nextConfig: NextConfig = {
   transpilePackages: ['@collabdoc/database', '@collabdoc/shared', '@collabdoc/yjs-utils'],
@@ -41,4 +42,25 @@ const nextConfig: NextConfig = {
   ],
 };
 
-export default nextConfig;
+export default withSentryConfig(nextConfig, {
+  // For all available options, see:
+  // https://github.com/getsentry/sentry-webpack-plugin#options
+
+  org: 'collabdoc',
+  project: 'web',
+
+  // Only print logs when triaging tunnels
+  silent: !process.env.CI,
+
+  // Forwards the error to Sentry if the build fails to upload source maps
+  widenClientFileUpload: true,
+
+  // Route browser requests to Sentry through a Next.js rewrite to circumvent ad-blockers
+  tunnelRoute: '/monitoring',
+
+  // Hides source maps from visitors
+  hideSourceMaps: true,
+
+  // Automatically tree-shake Sentry logger statements to reduce bundle size
+  disableLogger: true,
+});

@@ -13,7 +13,8 @@ export default ts.config(
       "**/.next/**",
       "**/coverage/**",
       "**/playwright-report/**",
-      "**/test-results/**"
+      "**/test-results/**",
+      "tests/load/**"
     ],
   },
   {

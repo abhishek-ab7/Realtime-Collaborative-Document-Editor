@@ -2,12 +2,32 @@ import express from 'express';
 import { createServer } from 'http';
 import { Server } from 'socket.io';
 import cors from 'cors';
+import * as Sentry from '@sentry/node';
 import { logger } from './lib/logger';
 import { socketAuthMiddleware } from './middleware/auth';
 import { registerRoomHandlers, handleLeaveRoom } from './handlers/room';
 import { registerCollaborationHandlers } from './handlers/collaboration';
 import { registerAwarenessHandlers } from './handlers/awareness';
 import { roomManager } from './rooms/room-manager';
+import { activeRoomsGauge, activeConnectionsGauge } from './lib/metrics';
+
+// Initialize Sentry for Node.js
+if (process.env.SENTRY_DSN) {
+  Sentry.init({
+    dsn: process.env.SENTRY_DSN,
+    tracesSampleRate: 0.1,
+  });
+  logger.info('Sentry initialized on socket server');
+}
+
+// Bind OpenTelemetry Gauge Observers
+activeRoomsGauge.addCallback((result) => {
+  result.observe(roomManager.getStats().activeRooms);
+});
+
+activeConnectionsGauge.addCallback((result) => {
+  result.observe(roomManager.getStats().totalConnections);
+});
 
 const PORT = parseInt(process.env.PORT || '3001', 10);
 const CORS_ORIGIN = process.env.CORS_ORIGIN || 'http://localhost:3000';
