@@ -114,6 +114,8 @@ model DocumentVersion {
   plainText   String   @map("plain_text")
   titleAtTime String   @map("title_at_time")
   byteSize    Int      @map("byte_size")
+  wordCount   Int      @default(0) @map("word_count")
+  trigger     String   @default("AUTO")
   createdAt   DateTime @default(now()) @map("created_at")
   creator     User     @relation(fields: [createdBy], references: [id])
   document    Document @relation(fields: [documentId], references: [id], onDelete: Cascade)

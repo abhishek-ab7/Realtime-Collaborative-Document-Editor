@@ -55,6 +55,13 @@ io.use(socketAuthMiddleware);
 // Give room manager a reference to io for save-status broadcasts
 roomManager.setIO(io);
 
+app.post('/internal/rooms/:id/force-reload', (req, res) => {
+  const documentId = req.params.id;
+  io.to(documentId).emit('force-reload');
+  roomManager.evictRoom(documentId);
+  res.json({ success: true });
+});
+
 io.on('connection', (socket) => {
   logger.info({ socketId: socket.id }, 'Client connected');
 
@@ -68,7 +75,9 @@ io.on('connection', (socket) => {
     logger.info({ socketId: socket.id, reason }, 'Client disconnected');
 
     // Clean up all rooms this socket was in
-    const rooms = (socket as any).__rooms as Set<string> | undefined;
+    type SocketWithMetadata = typeof socket & { __rooms?: Set<string> };
+    const metaSocket = socket as SocketWithMetadata;
+    const rooms = metaSocket.__rooms;
     if (rooms) {
       for (const documentId of rooms) {
         handleLeaveRoom(io, socket, documentId);

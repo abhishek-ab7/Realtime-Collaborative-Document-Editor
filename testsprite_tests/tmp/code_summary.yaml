@@ -1,0 +1,74 @@
+version: "2"
+type: frontend
+tech_stack:
+  - TypeScript
+  - React (Next.js)
+  - Tailwind CSS
+  - Yjs (Collaboration)
+  - Tiptap (Rich Text Editor)
+routes:
+  - path: /
+    file: apps/web/src/app/page.tsx
+    auth_required: false
+    description: Public landing page of the collaborative editor.
+  - path: /signin
+    file: apps/web/src/app/(auth)/signin/page.tsx
+    auth_required: false
+    description: Sign-in page for user authentication.
+  - path: /signup
+    file: apps/web/src/app/(auth)/signup/page.tsx
+    auth_required: false
+    description: Sign-up page to register a new user.
+  - path: /dashboard
+    file: apps/web/src/app/(app)/dashboard/page.tsx
+    auth_required: true
+    description: User dashboard listing their documents, with actions to create or delete documents.
+  - path: /d/[documentId]
+    file: apps/web/src/app/(app)/d/[documentId]/page.tsx
+    auth_required: true
+    description: Realtime collaborative rich-text document editor page powered by Yjs, Tiptap, and Socket.io.
+  - path: /settings
+    file: apps/web/src/app/(app)/settings/page.tsx
+    auth_required: true
+    description: User profile and settings page.
+  - path: /trash
+    file: apps/web/src/app/(app)/trash/page.tsx
+    auth_required: true
+    description: Deleted documents page with restore options.
+features:
+  - name: User Authentication
+    description: Users can sign in or sign up using email and password.
+    files:
+      - apps/web/src/app/(auth)/signin/page.tsx
+      - apps/web/src/app/(auth)/signup/page.tsx
+    entry_route: /signin
+    user_interactions:
+      - Fill in email and password credentials.
+      - Click Submit/Sign In.
+      - Redirects to /dashboard upon successful authentication.
+    api_calls:
+      - method: POST
+        endpoint: /api/auth/signin
+    auth_required: false
+  - name: Dashboard and Document Management
+    description: Create, view, open, and archive collaborative documents.
+    files:
+      - apps/web/src/app/(app)/dashboard/page.tsx
+    entry_route: /dashboard
+    user_interactions:
+      - View a list of user's active documents.
+      - Click "New Document" to create a collaborative document.
+      - Click a document in the list to open it.
+      - Click "Move to Trash" to archive a document.
+    auth_required: true
+  - name: Collaborative Editor
+    description: Realtime collaborative rich text editing with cursor presence.
+    files:
+      - apps/web/src/app/(app)/d/[documentId]/page.tsx
+      - apps/socket-server/src/rooms/room-manager.ts
+    entry_route: /d/[documentId]
+    user_interactions:
+      - Edit text simultaneously with other users.
+      - View live cursor presence and usernames of other active collaborators.
+    auth_required: true
+known_limitations: []

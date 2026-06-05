@@ -1,7 +1,7 @@
 import { prisma } from '@collabdoc/database';
 import { MAX_SNAPSHOTS_PER_DOCUMENT } from '@collabdoc/shared';
 import { logger } from '../lib/logger';
-import { extractPlainText, countWords } from '../lib/text-utils';
+import { extractPlainText, countWords } from '@collabdoc/shared';
 import * as Y from 'yjs';
 
 /** Load the latest Yjs state from PostgreSQL */

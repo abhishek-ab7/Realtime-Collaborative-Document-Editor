@@ -16,7 +16,9 @@ export function registerCollaborationHandlers(_io: Server, socket: Socket) {
     if (!room.users.has(socket.id)) return;
 
     // Check edit permission
-    const role = (socket as any).__role;
+    type SocketWithMetadata = typeof socket & { __role?: string | null };
+    const metaSocket = socket as SocketWithMetadata;
+    const role = metaSocket.__role;
     if (role === 'VIEWER') return; // Silently ignore viewer edits
 
     try {

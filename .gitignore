@@ -16,3 +16,5 @@ test-results/
 .husky/
 .agents/
 .playwright-mcp/
+
+testsprite_tests/tmp/config.json
