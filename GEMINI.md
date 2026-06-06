@@ -7,11 +7,11 @@ All decisions, architecture notes, debugging logs, and phase progress are here.
 
 ### Key Files Agents Should Read First
 
-- [00-index.md](file:///home/abhi/Downloads/Realtime%20Collaborative%20Document%20Editor/docs/00-index.md) — Navigation hub
-- [tech-stack.md](file:///home/abhi/Downloads/Realtime%20Collaborative%20Document%20Editor/docs/01-project-overview/tech-stack.md) — Current stack
-- [constraints.md](file:///home/abhi/Downloads/Realtime%20Collaborative%20Document%20Editor/docs/01-project-overview/constraints.md) — Hard rules
-- [yjs-sync-design.md](file:///home/abhi/Downloads/Realtime%20Collaborative%20Document%20Editor/docs/04-architecture/yjs-sync-design.md) — Core architecture
-- [database-schema.md](file:///home/abhi/Downloads/Realtime%20Collaborative%20Document%20Editor/docs/04-architecture/database-schema.md) — Database schema
+- [00-index.md](docs/00-index.md) — Navigation hub
+- [tech-stack.md](docs/01-project-overview/tech-stack.md) — Current stack
+- [constraints.md](docs/01-project-overview/constraints.md) — Hard rules
+- [yjs-sync-design.md](docs/04-architecture/yjs-sync-design.md) — Core architecture
+- [database-schema.md](docs/04-architecture/database-schema.md) — Database schema
 
 ### When Creating New Notes
 

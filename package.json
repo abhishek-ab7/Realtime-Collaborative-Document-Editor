@@ -19,7 +19,10 @@
     "db:push": "cd packages/database && npx prisma db push",
     "db:seed": "cd packages/database && npx prisma db seed",
     "db:studio": "cd packages/database && npx prisma studio",
-    "prepare": "husky"
+    "prepare": "husky",
+    "vault:sync": "tsx scripts/sync-vault.ts",
+    "vault:context": "tsx scripts/build-ai-context.ts",
+    "vault:update": "npm run vault:sync && npm run vault:context"
   },
   "devDependencies": {
     "@codecov/nextjs-webpack-plugin": "^2.0.1",
@@ -31,6 +34,7 @@
     "lint-staged": "^15.0.0",
     "prettier": "^3.5.0",
     "prettier-plugin-tailwindcss": "^0.8.0",
+    "tsx": "^4.0.0",
     "turbo": "^2.5.0",
     "typescript-eslint": "^8.60.1",
     "vitest": "^3.2.6"

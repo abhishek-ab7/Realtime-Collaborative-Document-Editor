@@ -3,7 +3,7 @@
 > **Project:** Realtime Collaborative Document Editor  
 > **Total Phases:** 10  
 > **Total Estimated Days:** 49  
-> **Source PRD:** [PRD.md](file:///home/abhi/Downloads/Realtime%20Collaborative%20Document%20Editor/PRD.md)
+> **Source PRD:** [PRD.md](../PRD.md)
 
 ---
 

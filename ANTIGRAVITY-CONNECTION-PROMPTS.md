@@ -281,27 +281,27 @@ After this, we're ready to START PHASE 01 IMPLEMENTATION.
 
 ```
 ═══════════════════════════════════════════════════════════════
-MORNING SYNC — Read Vault & Plan Today
+MORNING SYNC
 ═══════════════════════════════════════════════════════════════
 
-Read from your Obsidian vault:
-- docs/00-VAULT-INDEX.md (refresh navigation)
-- docs/03-daily-logs/current-day.md (what was in progress?)
-- docs/02-phases/phase-XX-[name].md (current phase spec)
-- docs/04-architecture/[relevant].md (design reference)
+Read THESE SPECIFIC files (in this order, no others):
 
-Then tell me:
+docs/ai-context.md — contains current status, phase, today's task
+docs/PROJECT-STATUS.md — live build health
+docs/03-daily-logs/current-day.md — what's in progress
 
-1. What phase are we in? (number and name)
-2. What's our status in this phase? (% complete)
-3. What was the last thing we built? (from current-day.md)
-4. Any blockers from yesterday?
-5. What are we building TODAY? (next task from phase spec)
-6. Do we need to design any UI with Stitch first?
+Then answer:
 
-After you answer, I'll give you the next prompt to execute.
+What phase are we in and what is the percentage complete?
+What is today's specific task (one sentence)?
+Are there any TypeScript errors or failing tests?
+What was the last thing built (from git log in PROJECT-STATUS)?
+What files will we need to touch today?
 
-Do not start coding yet. Just establish context.
+After answering, check docs/ai-context.md for any blockers.
+Only THEN ask if I'm ready to proceed.
+Do NOT read any other docs files unless I ask you to.
+Total reading time should be < 30 seconds.
 ```
 
 ---

@@ -5,14 +5,14 @@
 
 **Files:**
 
-- Modify: [[.gitignore](file:///home/abhi/Downloads/Realtime%20Collaborative%20Document%20Editor/.gitignore)]
-- Modify: [[package.json](file:///home/abhi/Downloads/Realtime%20Collaborative%20Document%20Editor/package.json)]
-- Modify: [[apps/web/package.json](file:///home/abhi/Downloads/Realtime%20Collaborative%20Document%20Editor/apps/web/package.json)]
-- Modify: [[apps/socket-server/package.json](file:///home/abhi/Downloads/Realtime%20Collaborative%20Document%20Editor/apps/socket-server/package.json)]
-- Modify: [[packages/database/package.json](file:///home/abhi/Downloads/Realtime%20Collaborative%20Document%20Editor/packages/database/package.json)]
-- Modify: [[packages/shared/package.json](file:///home/abhi/Downloads/Realtime%20Collaborative%20Document%20Editor/packages/shared/package.json)]
-- Modify: [[apps/web/next.config.ts](file:///home/abhi/Downloads/Realtime%20Collaborative%20Document%20Editor/apps/web/next.config.ts)]
-- Modify: [[.github/workflows/ci.yml](file:///home/abhi/Downloads/Realtime%20Collaborative%20Document%20Editor/.github/workflows/ci.yml)]
+- Modify: [[.gitignore](../../.gitignore)]
+- Modify: [[package.json](../../package.json)]
+- Modify: [[apps/web/package.json](../../apps/web/package.json)]
+- Modify: [[apps/socket-server/package.json](../../apps/socket-server/package.json)]
+- Modify: [[packages/database/package.json](../../packages/database/package.json)]
+- Modify: [[packages/shared/package.json](../../packages/shared/package.json)]
+- Modify: [[apps/web/next.config.ts](../../apps/web/next.config.ts)]
+- Modify: [[.github/workflows/ci.yml](../../.github/workflows/ci.yml)]
 
 **Order:**
 

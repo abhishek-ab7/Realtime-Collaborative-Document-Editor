@@ -30,6 +30,9 @@
         "NEXT_PUBLIC_SUPABASE_ANON_KEY",
         "CODECOV_TOKEN"
       ]
+    },
+    "vault:sync": {
+      "dependsOn": ["test"]
     }
   }
 }
