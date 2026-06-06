@@ -1,6 +1,23 @@
 {
   "$schema": "https://turbo.build/schema.json",
   "globalDependencies": ["**/.env.*local"],
+  "globalEnv": [
+    "DATABASE_URL",
+    "AUTH_SECRET",
+    "AUTH_GOOGLE_ID",
+    "AUTH_GOOGLE_SECRET",
+    "AUTH_URL",
+    "NEXT_PUBLIC_SOCKET_URL",
+    "SOCKET_AUTH_SECRET",
+    "PORT",
+    "NODE_ENV",
+    "LOG_LEVEL",
+    "CORS_ORIGIN",
+    "GEMINI_API_KEY",
+    "SENTRY_DSN",
+    "NEXT_PUBLIC_SENTRY_DSN",
+    "NEXT_PUBLIC_APP_URL"
+  ],
   "tasks": {
     "dev": {
       "cache": false,
