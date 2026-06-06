@@ -10,8 +10,10 @@ test.describe('E2E Permissions Enforcement', () => {
     const viewerEmail = `viewer-${Date.now()}@example.com`;
     const viewerPassword = 'TestPassword123!';
 
-    // 2. Open a second browser context to sign up the viewer
-    const secondContext = await browser.newContext();
+    // 2. Open a second browser context with empty storage state to sign up the viewer
+    const secondContext = await browser.newContext({
+      storageState: { cookies: [], origins: [] },
+    });
     const viewerPage = await secondContext.newPage();
 
     await viewerPage.goto('/signup');
@@ -37,10 +39,10 @@ test.describe('E2E Permissions Enforcement', () => {
     await page.fill('[data-testid="invite-email-input"]', viewerEmail);
     // Select VIEWER role
     await page.selectOption('[data-testid="invite-role-select"]', 'VIEWER');
-    await page.click('[data-testid="invite-submit-button"]');
+    await page.click('[data-testid="invite-button"]');
 
     // Wait for collaborator to appear in list
-    await expect(page.locator(`text=${viewerEmail}`)).toBeVisible();
+    await expect(page.locator(`text=${viewerEmail}`).first()).toBeVisible();
     // Close dialog
     await page.keyboard.press('Escape');
 

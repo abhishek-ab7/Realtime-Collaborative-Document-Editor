@@ -1,8 +1,8 @@
 import { MeterProvider, PeriodicExportingMetricReader } from '@opentelemetry/sdk-metrics';
 import { OTLPMetricExporter } from '@opentelemetry/exporter-metrics-otlp-proto';
-import { Resource } from '@opentelemetry/resources';
+import { resourceFromAttributes } from '@opentelemetry/resources';
 
-const resource = new Resource({ 'service.name': 'collabdoc-socket' });
+const resource = resourceFromAttributes({ 'service.name': 'collabdoc-socket' });
 const metricReader = new PeriodicExportingMetricReader({
   exporter: new OTLPMetricExporter(),
   exportIntervalMillis: 60000, // Export every minute

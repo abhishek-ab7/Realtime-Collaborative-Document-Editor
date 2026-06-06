@@ -26,7 +26,7 @@ export default defineConfig({
   ],
   webServer: {
     command: 'npm run dev',
-    url: 'http://localhost:3000',
+    url: 'http://localhost:3001/health',
     reuseExistingServer: !process.env.CI,
   },
 });
