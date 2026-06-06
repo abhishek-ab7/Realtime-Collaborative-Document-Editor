@@ -4,7 +4,7 @@
 
 As the project grows across 10 implementation phases, our Obsidian vault contains extensive context scattered across multiple directories (specifications, architecture, debugging journals, and daily progress logs). Manually feeding these logs to the agent at the start of a session is error-prone, consumes unnecessary context tokens, and leads to stale information about test results or git commit history.
 
-We need a unified, lightweight, and automated system to keep the Obsidian vault in sync with active code status and compile a concise session summary specifically tailored for Google Antigravity and Claude Code.
+We need a unified, lightweight, and automated system to keep the Obsidian vault in sync with active code status and compile a concise session summary specifically tailored for Google Antigravity.
 
 ## Decision
 

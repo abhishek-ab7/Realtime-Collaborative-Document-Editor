@@ -1,8 +1,8 @@
-# Obsidian MCP Setup — Connect Antigravity & Claude to Your Vault
+# Obsidian MCP Setup — Connect Antigravity to Your Vault
 
 ## What This Does
 
-The Obsidian MCP plugin lets Antigravity and Claude Code read/write your Obsidian vault
+The Obsidian MCP plugin lets Antigravity read/write your Obsidian vault
 directly during sessions, without copy-pasting prompts.
 
 ## Setup (Free, 15 minutes)
@@ -32,25 +32,7 @@ In your Antigravity IDE configuration (typically in your system MCP servers list
 }
 ```
 
-### Step 3: Add to Claude Code config (Optional)
-
-In your `~/.claude/config.json`:
-
-```json
-{
-  "mcpServers": {
-    "obsidian": {
-      "command": "npx",
-      "args": ["-y", "mcp-obsidian"],
-      "env": {
-        "VAULT_PATH": "/home/abhi/Downloads/Realtime Collaborative Document Editor/docs"
-      }
-    }
-  }
-}
-```
-
-### Step 4: Use in sessions
+### Step 3: Use in sessions
 
 Antigravity can now call tools like:
 
