@@ -20,6 +20,10 @@
 - `apps/socket-server/Dockerfile`
 - `apps/web/vercel.json`
 
+**1 new documentation file:**
+
+- `docs/11-deployment/render-setup.md`
+
 ## Files Modified
 
 **7 documentation files:**

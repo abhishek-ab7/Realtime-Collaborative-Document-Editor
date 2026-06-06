@@ -53,5 +53,6 @@ This ensures fast initial page load times and prevents SSR compile errors for br
 **Related Links:**
 
 - [[11-deployment/railway-setup|Socket Server Railway Setup]]
+- [[11-deployment/render-setup|Socket Server Render Setup]]
 - [[11-deployment/database-setup|PostgreSQL Database Setup]]
 - [[11-deployment/production-checklist|Production Launch Checklist]]

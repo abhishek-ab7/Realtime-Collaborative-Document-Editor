@@ -1,10 +1,12 @@
-# Socket.io Server on Railway
+# Socket.io Server on Render
 
-This guide outlines how to deploy the WebSocket and collaboration sync server (`apps/socket-server`) to Railway using the multi-stage `Dockerfile`.
+This guide outlines how to deploy the WebSocket and collaboration sync server (`apps/socket-server`) to Render as a Web Service using Docker.
 
-## 1. Multi-Stage Dockerfile
+## 1. Multi-Stage Dockerfile (Hoisted Workspace Support)
 
-The socket server is deployed inside a lightweight Alpine container. The `Dockerfile` compiles the TypeScript codebase and generates the Prisma client schema to communicate with PostgreSQL:
+The socket server is deployed inside a lightweight Alpine container. The `Dockerfile` compiles the TypeScript codebase and generates the Prisma client schema to communicate with PostgreSQL.
+
+Because the project is structured as an npm workspace, all dependencies are hoisted to the root `/app/node_modules`. The Dockerfile is configured to support hoisted dependencies correctly:
 
 ```dockerfile
 # apps/socket-server/Dockerfile
@@ -41,18 +43,19 @@ EXPOSE 3001
 CMD ["node", "dist/index.js"]
 ```
 
-## 2. Service Settings in Railway
+## 2. Web Service Configurations in Render
 
-Set up the following configurations in your Railway service settings panel:
+Create a new **Web Service** on Render and configure the following parameters:
 
-- **Source Directory**: Set to `/` or keep default.
-- **Build Command**: Set to `docker build -f apps/socket-server/Dockerfile -t collabdoc-socket .` (Railway automatically detects the Dockerfile when configured).
-- **Port**: Configure `3001` as the internal port.
-- **Health Check Path**: Set the health check URL path to `/health`. The server will respond with status `200 OK` and active connection metrics.
+- **Runtime**: Select `Docker` as the runtime.
+- **Docker Command**: Leave blank to default to `CMD` in Dockerfile.
+- **Dockerfile Path**: Set to `apps/socket-server/Dockerfile`.
+- **Docker Build Context**: Set to `.` (the root of the repository). _Do not set to `apps/socket-server/` because the build needs files from the monorepo root and the packages workspace._
+- **Plan**: Select a plan that supports WebSockets and background execution.
 
 ## 3. Environment Variables
 
-Configure the following variables in the Railway variables panel:
+Configure the following variables in the Render environment settings:
 
 | Variable             | Description                                       | Value Example                            |
 | -------------------- | ------------------------------------------------- | ---------------------------------------- |
@@ -63,10 +66,11 @@ Configure the following variables in the Railway variables panel:
 | `SOCKET_AUTH_SECRET` | Shared JWT secret key (must match Next.js config) | _Generate a secure 32+ character string_ |
 | `SENTRY_DSN`         | Sentry integration DSN                            | `https://key@sentry.io/project`          |
 
-## 4. Scaling and Observability
+## 4. Scaling and Settings
 
-- **Sticky Sessions**: Ensure that sticky sessions are enabled if scaling beyond 1 replica, as Socket.io connections rely on handshake handovers.
-- **OTel Prometheus Exporter**: The server exposes custom OpenTelemetry metrics (`collabdoc.active_rooms`, `collabdoc.active_connections`, `collabdoc.yjs_sync_latency_ms`) that can be scraped or queried via observability integrations.
+- **WebSockets / HTTP 1.1 Support**: Render natively supports WebSockets. Make sure your client uses secure socket connections (`wss://your-service.onrender.com`).
+- **Health Check Path**: Set to `/health`. Render will send requests to this path to check if the instance is ready before routing traffic.
+- **Connections / Auto-Deploy**: You can configure auto-deploys to trigger whenever you push to the `main` branch.
 
 **Related Links:**
 

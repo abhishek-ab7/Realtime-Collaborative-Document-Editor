@@ -48,4 +48,5 @@ npx prisma migrate deploy
 
 - [[11-deployment/vercel-setup|Next.js Vercel Setup]]
 - [[11-deployment/railway-setup|Socket Server Railway Setup]]
+- [[11-deployment/render-setup|Socket Server Render Setup]]
 - [[04-architecture/database-schema|Prisma Database Schema]]

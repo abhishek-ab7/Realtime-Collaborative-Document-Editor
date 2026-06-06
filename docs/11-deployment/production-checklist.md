@@ -37,4 +37,5 @@ This checklist documents the required validation steps before launching the coll
 
 - [[11-deployment/vercel-setup|Next.js Vercel Setup]]
 - [[11-deployment/railway-setup|Socket Server Railway Setup]]
+- [[11-deployment/render-setup|Socket Server Render Setup]]
 - [[10-observability/sentry-setup|Sentry Integration Setup]]

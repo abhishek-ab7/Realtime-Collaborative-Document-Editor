@@ -6,3 +6,4 @@ Troubleshooting record for Vercel timeouts, standalone server CORS blockages, an
 
 - [[11-deployment/vercel-setup|Vercel Setup]]
 - [[11-deployment/railway-setup|Railway Setup]]
+- [[11-deployment/render-setup|Render Setup]]

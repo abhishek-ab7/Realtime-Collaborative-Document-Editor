@@ -68,4 +68,5 @@ OTEL_EXPORTER_OTLP_ENDPOINT=http://your-otel-collector:4318
 **Related Links:**
 
 - [[11-deployment/railway-setup|Socket Server Railway Setup]]
+- [[11-deployment/render-setup|Socket Server Render Setup]]
 - [[10-observability/monitoring-dashboards|Monitoring Dashboards Guide]]
