@@ -32,6 +32,7 @@ Configure the following environment variables in the Vercel dashboard:
 | `AUTH_URL`               | Canonical URL of the production deployment              | `https://collabdoc-web.vercel.app`                           |
 | `NEXT_PUBLIC_SOCKET_URL` | Endpoint of the live Socket.io server                   | `https://collabdoc-socket.railway.app`                       |
 | `SOCKET_AUTH_SECRET`     | Shared JWT signing key for WebSockets                   | _Generate a secure 32+ character string_                     |
+| `GEMINI_API_KEY`         | API Key for Google Gemini AI integrations               | _Your Gemini API Key_                                        |
 | `SENTRY_DSN`             | Sentry DSN for server-side error capturing              | `https://key@sentry.io/project`                              |
 | `NEXT_PUBLIC_SENTRY_DSN` | Sentry DSN for client-side error capturing              | `https://key@sentry.io/project`                              |
 | `NEXT_PUBLIC_APP_URL`    | App public address (used for redirect paths)            | `https://collabdoc-web.vercel.app`                           |

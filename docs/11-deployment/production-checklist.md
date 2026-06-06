@@ -9,6 +9,7 @@ This checklist documents the required validation steps before launching the coll
 - [ ] **JWT Key Strength**: Verify that `SOCKET_AUTH_SECRET` and `AUTH_SECRET` are securely generated keys (minimum 32+ characters).
 - [ ] **CORS Origin Boundaries**: Restrict the WebSocket server's `CORS_ORIGIN` to match your Vercel production domain.
 - [ ] **Database Connection Sizing**: Connection pool parameters set correctly (`connection_limit` adjusted to prevent exhaustion).
+- [ ] **Gemini AI Integration**: Confirm that `GEMINI_API_KEY` is set on Vercel to activate the writing assistant in production.
 
 ## 2. Testing & Quality Gates
 

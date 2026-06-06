@@ -41,8 +41,8 @@ ${context || '[Empty Document]'}
 """`;
     }
 
-    // Fallback if ANTHROPIC_API_KEY is not defined
-    if (!process.env.ANTHROPIC_API_KEY) {
+    // Fallback if GEMINI_API_KEY is not defined
+    if (!process.env.GEMINI_API_KEY) {
       // Mock AI response for local development / testing
       let reply = '';
       const lowerMsg = message.toLowerCase();
@@ -56,31 +56,39 @@ ${context || '[Empty Document]'}
       } else if (lowerMsg.includes('title')) {
         reply = `Here are some better title suggestions for "${title}":\n\n1. Collaborative Real-time Hub\n2. Real-time Document Platform\n3. Workspace: ${title}`;
       } else {
-        reply = `Hello! I am your AI Assistant for "${title}".\n\nI received your query: "${message}".\n\nTo enable live Claude 3.5 Sonnet responses, please configure the ANTHROPIC_API_KEY environment variable.`;
+        reply = `Hello! I am your AI Assistant for "${title}".\n\nI received your query: "${message}".\n\nTo enable live Gemini responses, please configure the GEMINI_API_KEY environment variable.`;
       }
 
       return Response.json({ text: reply });
     }
 
-    // Call Anthropic API
-    const response = await fetch('https://api.anthropic.com/v1/messages', {
-      method: 'POST',
-      headers: {
-        'x-api-key': process.env.ANTHROPIC_API_KEY,
-        'anthropic-version': '2023-06-01',
-        'content-type': 'application/json',
+    // Call Gemini API
+    const response = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${process.env.GEMINI_API_KEY}`,
+      {
+        method: 'POST',
+        headers: {
+          'content-type': 'application/json',
+        },
+        body: JSON.stringify({
+          contents: [
+            {
+              parts: [{ text: message }],
+            },
+          ],
+          systemInstruction: {
+            parts: [{ text: systemPrompt }],
+          },
+          generationConfig: {
+            maxOutputTokens: 1500,
+          },
+        }),
       },
-      body: JSON.stringify({
-        model: 'claude-3-5-sonnet-20241022',
-        max_tokens: 1500,
-        system: systemPrompt,
-        messages: [{ role: 'user', content: message }],
-      }),
-    });
+    );
 
     if (!response.ok) {
       const errorText = await response.text();
-      console.error('Anthropic API error response:', errorText);
+      console.error('Gemini API error response:', errorText);
       return Response.json(
         { error: 'Failed to communicate with AI provider' },
         { status: response.status },
@@ -88,7 +96,7 @@ ${context || '[Empty Document]'}
     }
 
     const result = await response.json();
-    const replyText = result.content?.[0]?.text || 'No response generated.';
+    const replyText = result.candidates?.[0]?.content?.parts?.[0]?.text || 'No response generated.';
 
     return Response.json({ text: replyText });
   } catch (error) {
