@@ -15,7 +15,7 @@ RUN NODE_ENV=development npm ci
 # Build the project
 FROM base AS builder
 WORKDIR /app
-COPY --from=deps /app/node_modules ./node_modules
+COPY --from=deps /app /app
 COPY . .
 RUN cd packages/database && npx prisma generate
 RUN cd apps/socket-server && npm run build
@@ -27,9 +27,12 @@ FROM base AS runner
 WORKDIR /app
 ENV NODE_ENV production
 
-# Copy built files and the hoisted node_modules (containing the generated Prisma Client)
-COPY --from=builder /app/apps/socket-server/dist ./dist
+# Copy built files, hoisted and workspace-specific node_modules, and packages (for database/prisma symlinks)
+COPY --from=builder /app/apps/socket-server/dist ./apps/socket-server/dist
 COPY --from=builder /app/node_modules ./node_modules
+COPY --from=builder /app/apps/socket-server/node_modules ./apps/socket-server/node_modules
+COPY --from=builder /app/packages ./packages
 
+WORKDIR /app/apps/socket-server
 EXPOSE 3001
 CMD ["node", "dist/index.js"]
