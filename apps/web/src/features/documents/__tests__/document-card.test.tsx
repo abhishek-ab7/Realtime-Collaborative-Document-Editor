@@ -30,6 +30,12 @@ vi.mock('@/components/ui/avatar', () => {
   };
 });
 
+vi.mock('@/components/ui/user-avatar', () => {
+  return {
+    UserAvatar: ({ src, name }: any) => React.createElement('img', { src, alt: name }),
+  };
+});
+
 vi.mock('@/components/ui/tooltip', () => {
   return {
     TooltipProvider: ({ children }: any) => <div>{children}</div>,

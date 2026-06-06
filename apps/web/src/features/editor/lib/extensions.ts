@@ -16,6 +16,12 @@ import CollaborationCaret from '@tiptap/extension-collaboration-caret';
 import { TextStyle } from '@tiptap/extension-text-style';
 import Color from '@tiptap/extension-color';
 import FontFamily from '@tiptap/extension-font-family';
+import { Table } from '@tiptap/extension-table';
+import { TableRow } from '@tiptap/extension-table-row';
+import { TableHeader } from '@tiptap/extension-table-header';
+import { TableCell } from '@tiptap/extension-table-cell';
+import Image from '@tiptap/extension-image';
+import { SlashCommands } from '../extensions/slash-commands';
 import { common, createLowlight } from 'lowlight';
 import type * as Y from 'yjs';
 import type { Awareness } from 'y-protocols/awareness';
@@ -133,6 +139,20 @@ export function getEditorExtensions(options?: ExtensionOptions) {
     Color.configure({ types: ['textStyle'] }),
     FontFamily.configure({ types: ['textStyle'] }),
     FontSize,
+    Table.configure({
+      resizable: true,
+      HTMLAttributes: { class: 'editor-table' },
+    }),
+    TableRow,
+    TableHeader,
+    TableCell,
+    Image.configure({
+      HTMLAttributes: {
+        class:
+          'editor-image rounded-lg max-w-full my-4 shadow-sm border border-[var(--color-border-default)]',
+      },
+    }),
+    SlashCommands,
   ];
 
   // Add collaboration extensions when Y.Doc is provided

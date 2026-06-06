@@ -5,7 +5,7 @@ import { Star, MoreVertical, FileText, RotateCcw, Trash2 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { DocumentContextMenu } from './document-context-menu';
 import { cn } from '@/lib/utils';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { UserAvatar } from '@/components/ui/user-avatar';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
 interface DocumentCardProps {
@@ -178,15 +178,15 @@ export function DocumentCard({
             <Tooltip>
               <TooltipTrigger
                 render={
-                  <div className="h-6 w-6 cursor-help overflow-hidden rounded-full ring-2 ring-white" />
+                  <div className="cursor-help overflow-hidden rounded-full ring-2 ring-white" />
                 }
               >
-                <Avatar className="h-full w-full">
-                  <AvatarImage src={owner.avatarUrl ?? undefined} alt={owner.name ?? ''} />
-                  <AvatarFallback className="flex items-center justify-center bg-[var(--color-brand-primary)] text-[10px] text-white">
-                    {initials}
-                  </AvatarFallback>
-                </Avatar>
+                <UserAvatar
+                  src={owner.avatarUrl}
+                  name={owner.name}
+                  size={24}
+                  color="var(--color-brand-primary)"
+                />
               </TooltipTrigger>
               <TooltipContent>
                 <p className="text-xs">Owner: {owner.name || 'Unknown'}</p>

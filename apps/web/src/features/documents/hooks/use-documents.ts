@@ -1,6 +1,8 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useCallback, useMemo } from 'react';
+import useSWR from 'swr';
+import { updateDocument } from '@/features/documents/actions/document-actions';
 
 interface DocumentOwner {
   id: string;
@@ -39,17 +41,15 @@ interface FetchDocumentsOptions {
   limit?: number;
 }
 
-export function useDocuments(initialOptions: FetchDocumentsOptions = {}) {
-  const [documents, setDocuments] = useState<Document[]>([]);
-  const [pagination, setPagination] = useState<Pagination>({
-    page: 1,
-    limit: 20,
-    total: 0,
-    totalPages: 0,
-  });
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+const fetcher = async (url: string) => {
+  const response = await fetch(url);
+  if (!response.ok) {
+    throw new Error('Failed to fetch documents');
+  }
+  return response.json();
+};
 
+export function useDocuments(initialOptions: FetchDocumentsOptions = {}, fallbackData?: any) {
   const [options, setOptions] = useState<FetchDocumentsOptions>({
     status: 'ACTIVE',
     sort: 'accessed',
@@ -59,38 +59,33 @@ export function useDocuments(initialOptions: FetchDocumentsOptions = {}) {
     ...initialOptions,
   });
 
-  const fetchDocuments = useCallback(async () => {
-    setIsLoading(true);
-    setError(null);
-    try {
-      const queryParams = new URLSearchParams();
-      if (options.status) queryParams.set('status', options.status);
-      if (options.starred !== undefined) queryParams.set('starred', String(options.starred));
-      if (options.search) queryParams.set('search', options.search);
-      if (options.sort) queryParams.set('sort', options.sort);
-      if (options.order) queryParams.set('order', options.order);
-      if (options.page) queryParams.set('page', String(options.page));
-      if (options.limit) queryParams.set('limit', String(options.limit));
-
-      const response = await fetch(`/api/documents?${queryParams.toString()}`);
-      if (!response.ok) {
-        throw new Error('Failed to fetch documents');
-      }
-
-      const data = await response.json();
-      setDocuments(data.documents);
-      setPagination(data.pagination);
-    } catch (err) {
-      setError((err as Error).message || 'An error occurred');
-    } finally {
-      setIsLoading(false);
-    }
+  const queryParams = useMemo(() => {
+    const query = new URLSearchParams();
+    if (options.status) query.set('status', options.status);
+    if (options.starred !== undefined) query.set('starred', String(options.starred));
+    if (options.search) query.set('search', options.search);
+    if (options.sort) query.set('sort', options.sort);
+    if (options.order) query.set('order', options.order);
+    if (options.page) query.set('page', String(options.page));
+    if (options.limit) query.set('limit', String(options.limit));
+    return query.toString();
   }, [options]);
 
-  useEffect(() => {
-    const timer = setTimeout(() => fetchDocuments(), 0);
-    return () => clearTimeout(timer);
-  }, [fetchDocuments]);
+  const key = `/api/documents?${queryParams}`;
+
+  const { data, error, isLoading, mutate } = useSWR(key, fetcher, {
+    fallbackData,
+    dedupingInterval: 2000,
+    keepPreviousData: true,
+  });
+
+  const documents = data?.documents || [];
+  const pagination = data?.pagination || {
+    page: 1,
+    limit: 20,
+    total: 0,
+    totalPages: 0,
+  };
 
   const setPage = useCallback((page: number) => {
     setOptions((prev) => ({ ...prev, page }));
@@ -111,16 +106,45 @@ export function useDocuments(initialOptions: FetchDocumentsOptions = {}) {
     setOptions((prev) => ({ ...prev, status, page: 1 }));
   }, []);
 
+  const toggleStar = useCallback(
+    async (id: string, isStarred: boolean) => {
+      await mutate(
+        async (current: any) => {
+          await updateDocument(id, { isStarred });
+          if (!current) return current;
+          return {
+            ...current,
+            documents: current.documents.map((d: any) => (d.id === id ? { ...d, isStarred } : d)),
+          };
+        },
+        {
+          optimisticData: (current: any) => {
+            if (!current) return current;
+            return {
+              ...current,
+              documents: current.documents.map((d: any) => (d.id === id ? { ...d, isStarred } : d)),
+            };
+          },
+          rollbackOnError: true,
+          populateCache: true,
+          revalidate: false,
+        },
+      );
+    },
+    [mutate],
+  );
+
   return {
     documents,
     pagination,
     isLoading,
-    error,
+    error: error ? error.message : null,
     options,
     setPage,
     setSearch,
     setSort,
     setStatus,
-    refresh: fetchDocuments,
+    refresh: mutate,
+    toggleStar,
   };
 }

@@ -1,6 +1,6 @@
 'use client';
 
-import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
+import { UserAvatar } from '@/components/ui/user-avatar';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { X } from 'lucide-react';
@@ -45,12 +45,12 @@ export function CollaboratorList({
           className="flex items-center gap-3 rounded-lg px-2 py-2"
           data-testid="collaborator-owner"
         >
-          <Avatar className="h-8 w-8">
-            {owner.avatarUrl && <AvatarImage src={owner.avatarUrl} alt={owner.name || ''} />}
-            <AvatarFallback className="bg-[#e0e7ff] text-xs text-[#4f46e5]">
-              {getInitials(owner.name, owner.email)}
-            </AvatarFallback>
-          </Avatar>
+          <UserAvatar
+            src={owner.avatarUrl}
+            name={owner.name || owner.email}
+            size={32}
+            color="#4f46e5"
+          />
           <div className="min-w-0 flex-1">
             <p className="truncate text-sm font-medium text-[#0f172a]">
               {owner.name || owner.email}
@@ -70,12 +70,12 @@ export function CollaboratorList({
           className="group flex items-center gap-3 rounded-lg px-2 py-2 transition-colors hover:bg-[#f8fafc]"
           data-testid={`collaborator-${collab.id}`}
         >
-          <Avatar className="h-8 w-8">
-            {collab.avatarUrl && <AvatarImage src={collab.avatarUrl} alt={collab.name || ''} />}
-            <AvatarFallback className="bg-[#fef3c7] text-xs text-[#d97706]">
-              {getInitials(collab.name, collab.email)}
-            </AvatarFallback>
-          </Avatar>
+          <UserAvatar
+            src={collab.avatarUrl}
+            name={collab.name || collab.email}
+            size={32}
+            color="#d97706"
+          />
           <div className="min-w-0 flex-1">
             <p className="truncate text-sm font-medium text-[#0f172a]">
               {collab.name || collab.email}

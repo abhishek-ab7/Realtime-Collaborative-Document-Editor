@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Editor } from '@/features/editor/components/editor';
 import { EditorHeader } from '@/features/editor/components/editor-header';
 import { OfflineBanner } from '@/features/editor/components/offline-banner';
@@ -14,7 +14,8 @@ import { useVersions, VersionItem } from '@/features/editor/hooks/use-versions';
 import { VersionPanel } from '@/features/editor/components/version-history/version-panel';
 import { VersionDiffViewer } from '@/features/editor/components/version-history/version-diff';
 import { CommentsSidebar } from '@/features/editor/components/comments-sidebar';
-import { useState } from 'react';
+import { AIAssistantPanel } from '@/features/editor/components/ai-assistant-panel';
+import { CommandPalette } from '@/features/editor/components/command-palette';
 import type { DocumentRole } from '@/lib/permissions';
 import type { Editor as TipTapEditor } from '@tiptap/react';
 
@@ -53,9 +54,14 @@ function CollaborativeEditor({
 
   const editable = canEditDocument(role);
 
+  // Document Title State
+  const [currentTitle, setCurrentTitle] = useState(title);
+
   // Versions State
   const [editor, setEditor] = useState<TipTapEditor | null>(null);
   const [isCommentsOpen, setIsCommentsOpen] = useState(false);
+  const [isAIOpen, setIsAIOpen] = useState(false);
+  const [isCommandPaletteOpen, setIsCommandPaletteOpen] = useState(false);
   const [commentsTab, setCommentsTab] = useState<'comments' | 'history' | 'analytics' | 'settings'>(
     'comments',
   );
@@ -109,6 +115,18 @@ function CollaborativeEditor({
     return () => window.removeEventListener('open-diff-viewer', handleOpenDiff as EventListener);
   }, []);
 
+  // Listen for command palette trigger
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+        e.preventDefault();
+        setIsCommandPaletteOpen(true);
+      }
+    };
+    window.addEventListener('keydown', handler);
+    return () => window.removeEventListener('keydown', handler);
+  }, []);
+
   const isOffline = connectionStatus === 'disconnected';
 
   // Loading state until socket sync
@@ -130,12 +148,14 @@ function CollaborativeEditor({
     <div className="bg-background flex h-screen w-full flex-col overflow-hidden">
       <EditorHeader
         documentId={documentId}
-        title={title}
+        title={currentTitle}
         onOpenHistory={versionsHook.togglePanel}
         onOpenComments={() => setIsCommentsOpen(!isCommentsOpen)}
+        onOpenAI={() => setIsAIOpen(!isAIOpen)}
         role={role}
         commentCount={commentCount}
         editor={editor}
+        onTitleSave={setCurrentTitle}
       />
 
       {/* Offline warning banner */}
@@ -179,6 +199,14 @@ function CollaborativeEditor({
           onActiveTabChange={setCommentsTab}
         />
 
+        <AIAssistantPanel
+          isOpen={isAIOpen}
+          onClose={() => setIsAIOpen(false)}
+          documentId={documentId}
+          editor={editor}
+          documentTitle={currentTitle}
+        />
+
         <VersionPanel
           documentId={documentId}
           isOpen={versionsHook.isOpen}
@@ -195,6 +223,13 @@ function CollaborativeEditor({
         version={diffVersion}
         onClose={() => setDiffVersion(null)}
         onRestore={versionsHook.restoreVersion}
+      />
+
+      <CommandPalette
+        isOpen={isCommandPaletteOpen}
+        onClose={() => setIsCommandPaletteOpen(false)}
+        onOpenHistory={versionsHook.togglePanel}
+        onOpenAI={() => setIsAIOpen(true)}
       />
     </div>
   );

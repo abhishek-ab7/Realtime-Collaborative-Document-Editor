@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
-import { ArrowLeft, MoreHorizontal, History } from 'lucide-react';
+import { ArrowLeft, MoreHorizontal, History, Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { updateDocument } from '@/features/documents/actions/document-actions';
@@ -12,6 +12,8 @@ import { TypingIndicator } from '@/features/collaboration/components/typing-indi
 import { SaveStatus } from '@/features/editor/components/save-status';
 import { ConnectionStatus } from '@/features/collaboration/components/connection-status';
 import { ShareDialog } from '@/features/sharing/components/share-dialog';
+import { useConnectionStatus } from '@/features/collaboration/hooks/use-connection-status';
+import { useCollaborationContext } from '@/features/collaboration/providers/collaboration-provider';
 import { canRenameDocument } from '@collabdoc/shared';
 import type { DocumentRole } from '@/lib/permissions';
 import type { Editor } from '@tiptap/react';
@@ -29,8 +31,10 @@ interface EditorHeaderProps {
   commentCount?: number;
   onOpenHistory?: () => void;
   onOpenComments?: () => void;
+  onOpenAI?: () => void;
   role?: DocumentRole;
   editor?: Editor | null;
+  onTitleSave?: (title: string) => void;
 }
 
 export function EditorHeader({
@@ -39,13 +43,35 @@ export function EditorHeader({
   commentCount,
   onOpenHistory,
   onOpenComments,
+  onOpenAI,
   role = 'OWNER',
   editor,
+  onTitleSave,
 }: EditorHeaderProps) {
   const [title, setTitle] = useState(initialTitle);
   const [isEditing, setIsEditing] = useState(false);
   const [isShareOpen, setIsShareOpen] = useState(false);
+  const [showAutoSave, setShowAutoSave] = useState(true);
   const inputRef = useRef<HTMLInputElement>(null);
+
+  const { label: connectionLabel } = useConnectionStatus();
+  const { saveStatus, connectionStatus } = useCollaborationContext();
+
+  const getSaveStatusLabel = (status: string) => {
+    switch (status) {
+      case 'saving':
+        return 'Saving...';
+      case 'saved':
+        return 'Saved to cloud';
+      case 'error':
+        return 'Save failed';
+      case 'idle':
+      default:
+        return 'All changes saved';
+    }
+  };
+  const isOffline = connectionStatus === 'disconnected';
+  const saveStatusLabel = isOffline ? 'Offline — saved locally' : getSaveStatusLabel(saveStatus);
 
   const canRename = canRenameDocument(role);
 
@@ -88,6 +114,11 @@ export function EditorHeader({
     toast.success('Document exported as HTML');
   };
 
+  const exportAsPDF = () => {
+    window.print();
+    toast.success('Print dialog opened — save as PDF');
+  };
+
   const trashDocument = async () => {
     if (confirm('Are you sure you want to move this document to Trash?')) {
       try {
@@ -117,8 +148,43 @@ export function EditorHeader({
   }, [isEditing]);
 
   useEffect(() => {
+    setTitle(initialTitle);
+  }, [initialTitle]);
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      setShowAutoSave(localStorage.getItem('collabdoc-auto-save') !== 'false');
+    }
+  }, []);
+
+  useEffect(() => {
     document.title = `${title} — Collabdoc`;
   }, [title]);
+
+  useEffect(() => {
+    const handleOpenShare = () => {
+      setIsShareOpen(true);
+    };
+    window.addEventListener('open-share-dialog', handleOpenShare);
+    return () => window.removeEventListener('open-share-dialog', handleOpenShare);
+  }, []);
+
+  useEffect(() => {
+    const handleUpdateTitle = (e: Event) => {
+      const customEvent = e as CustomEvent;
+      const newTitle = customEvent.detail?.title;
+      if (newTitle) {
+        const trimmed = newTitle.trim() || 'Untitled Document';
+        setTitle(trimmed);
+        onTitleSave?.(trimmed);
+        updateDocument(documentId, { title: trimmed }).catch((err) => {
+          console.error('Failed to update title via event:', err);
+        });
+      }
+    };
+    window.addEventListener('update-document-title', handleUpdateTitle);
+    return () => window.removeEventListener('update-document-title', handleUpdateTitle);
+  }, [documentId, onTitleSave]);
 
   const saveTitle = async (newTitle: string) => {
     const trimmed = newTitle.trim() || 'Untitled Document';
@@ -126,6 +192,7 @@ export function EditorHeader({
     setTitle(trimmed);
     try {
       await updateDocument(documentId, { title: trimmed });
+      onTitleSave?.(trimmed);
     } catch {
       toast.error('Failed to save title');
       setTitle(initialTitle);
@@ -155,9 +222,9 @@ export function EditorHeader({
 
   return (
     <>
-      <header className="sticky top-0 z-50 flex h-16 w-full shrink-0 items-center justify-between border-b border-[#e2e8f0] bg-white px-10">
+      <header className="sticky top-0 z-50 flex h-16 w-full shrink-0 items-center justify-between border-b border-[#e2e8f0] bg-white px-4 md:px-10">
         {/* Left Section: Back, Brand Logo, Title & Menus */}
-        <div className="flex min-w-0 flex-1 items-center gap-6">
+        <div className="flex min-w-0 flex-1 items-center gap-3 md:gap-6">
           <Link
             href="/dashboard"
             className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-[#94a3b8] transition-all hover:bg-[#f1f5f9] hover:text-[#0f172a]"
@@ -180,7 +247,9 @@ export function EditorHeader({
               <path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z" />
               <path d="M14 2v4a2 2 0 0 0 2 2h4" />
             </svg>
-            <span className="text-lg font-bold text-[#3525cd]">Collabdoc</span>
+            <span className="hidden text-lg font-bold text-[#3525cd] sm:inline-block">
+              Collabdoc
+            </span>
           </div>
 
           {/* Title & Document Menu */}
@@ -220,19 +289,21 @@ export function EditorHeader({
         </div>
 
         {/* Right Section: Statuses, Avatars, History, Share, User Profile */}
-        <div className="flex shrink-0 items-center gap-4">
-          <div className="mr-1.5 flex shrink-0 items-center gap-2">
+        <div className="flex shrink-0 items-center gap-2 md:gap-4">
+          <div className="mr-1.5 hidden shrink-0 items-center gap-2 md:flex">
             <ConnectionStatus />
-            <SaveStatus />
+            {showAutoSave && <SaveStatus />}
             <TypingIndicator />
           </div>
-          <PresenceAvatars />
+          <div className="hidden md:flex">
+            <PresenceAvatars />
+          </div>
 
           {onOpenHistory && (
             <button
               type="button"
               onClick={onOpenHistory}
-              className="cursor-pointer rounded-full p-2 text-[#464555] transition-colors hover:bg-[#eceef0] active:opacity-80"
+              className="hidden cursor-pointer rounded-full p-2 text-[#464555] transition-colors hover:bg-[#eceef0] active:opacity-80 md:block"
               title="Version History"
             >
               <History className="h-5 w-5" />
@@ -242,7 +313,7 @@ export function EditorHeader({
           <button
             type="button"
             onClick={onOpenComments}
-            className="relative cursor-pointer rounded-full p-2 text-[#464555] transition-colors hover:bg-[#eceef0] active:opacity-80"
+            className="relative hidden cursor-pointer rounded-full p-2 text-[#464555] transition-colors hover:bg-[#eceef0] active:opacity-80 md:block"
             title="Comments"
           >
             <svg
@@ -262,6 +333,17 @@ export function EditorHeader({
               </span>
             )}
           </button>
+
+          {onOpenAI && (
+            <button
+              type="button"
+              onClick={onOpenAI}
+              className="hidden cursor-pointer rounded-full p-2 text-[#464555] transition-colors hover:bg-[#eceef0] active:opacity-80 md:block"
+              title="AI Assistant"
+            >
+              <Sparkles className="h-5 w-5 fill-indigo-50 text-indigo-500" />
+            </button>
+          )}
 
           <Button
             variant="default"
@@ -298,11 +380,7 @@ export function EditorHeader({
                 Document Details
               </DropdownMenuItem>
               <DropdownMenuSeparator />
-              <DropdownMenuItem
-                onClick={() => window.print()}
-                disabled={!editor}
-                className="cursor-pointer"
-              >
+              <DropdownMenuItem onClick={exportAsPDF} disabled={!editor} className="cursor-pointer">
                 Export as PDF (.pdf)
               </DropdownMenuItem>
               <DropdownMenuItem
@@ -329,6 +407,34 @@ export function EditorHeader({
               <DropdownMenuItem onClick={() => window.print()} className="cursor-pointer">
                 Print Document
               </DropdownMenuItem>
+
+              <div className="md:hidden">
+                <DropdownMenuSeparator />
+                {onOpenHistory && (
+                  <DropdownMenuItem onClick={onOpenHistory} className="cursor-pointer">
+                    Version History
+                  </DropdownMenuItem>
+                )}
+                {onOpenComments && (
+                  <DropdownMenuItem onClick={onOpenComments} className="cursor-pointer">
+                    Comments ({commentCount ?? 0})
+                  </DropdownMenuItem>
+                )}
+                {onOpenAI && (
+                  <DropdownMenuItem onClick={onOpenAI} className="cursor-pointer">
+                    AI Assistant
+                  </DropdownMenuItem>
+                )}
+                <DropdownMenuSeparator />
+                <DropdownMenuItem disabled className="text-xs font-medium text-slate-500">
+                  Connection: {connectionLabel}
+                </DropdownMenuItem>
+                {showAutoSave && (
+                  <DropdownMenuItem disabled className="text-xs font-medium text-slate-500">
+                    Save Status: {saveStatusLabel}
+                  </DropdownMenuItem>
+                )}
+              </div>
               {role === 'OWNER' && (
                 <>
                   <DropdownMenuSeparator />

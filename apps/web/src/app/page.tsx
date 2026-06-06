@@ -11,6 +11,7 @@ import {
   Shield,
   Layers,
   Sparkles,
+  Star,
 } from 'lucide-react';
 
 export default async function Home() {
@@ -77,7 +78,7 @@ export default async function Home() {
       </header>
 
       {/* Hero Section */}
-      <main className="mx-auto max-w-7xl px-4 pt-16 pb-24 sm:px-6 lg:px-8 lg:pt-24">
+      <main className="mx-auto flex min-h-[90vh] max-w-7xl items-center justify-center px-4 py-16 sm:px-6 lg:px-8">
         <div className="flex flex-col items-center text-center">
           {/* Announcement Badge */}
           <div className="animate-fade-in inline-flex items-center gap-1.5 rounded-full border border-indigo-200 bg-indigo-50/50 px-3.5 py-1 text-xs font-semibold text-indigo-700 dark:border-indigo-500/30 dark:bg-indigo-500/10 dark:text-indigo-400">
@@ -101,7 +102,7 @@ export default async function Home() {
           </p>
 
           {/* Actions */}
-          <div className="mt-10 flex flex-col justify-center gap-4 sm:flex-row">
+          <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
             <Link
               href="/signin"
               className="inline-flex h-12 items-center justify-center gap-2 rounded-xl bg-indigo-600 px-6 font-semibold text-white shadow-lg shadow-indigo-600/20 transition-all hover:-translate-y-0.5 hover:bg-indigo-500 active:scale-[0.98]"
@@ -109,12 +110,26 @@ export default async function Home() {
               Start Editing Now
               <ArrowRight className="h-4 w-4" />
             </Link>
+            <Link
+              href="/share/demo-token"
+              className="inline-flex h-12 items-center justify-center rounded-xl border border-slate-200 bg-white px-6 font-semibold text-slate-700 shadow-sm transition-all hover:-translate-y-0.5 hover:bg-slate-50 active:scale-[0.98] dark:border-slate-800 dark:bg-slate-900 dark:text-slate-300 dark:hover:bg-slate-800/80"
+            >
+              Try Demo
+            </Link>
             <a
               href="#features"
               className="inline-flex h-12 items-center justify-center rounded-xl border border-slate-200 bg-white px-6 font-semibold text-slate-700 shadow-sm transition-all hover:-translate-y-0.5 hover:bg-slate-50 active:scale-[0.98] dark:border-slate-800 dark:bg-slate-900 dark:text-slate-300 dark:hover:bg-slate-800/80"
             >
               Explore Features
             </a>
+          </div>
+
+          {/* Social Proof */}
+          <div className="mt-8 flex items-center justify-center gap-2 text-xs font-semibold text-slate-500">
+            <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
+            <span>Used by 5,000+ developers</span>
+            <span className="mx-1 h-3 w-px bg-slate-300 dark:bg-slate-800" />
+            <span>★ 4.9/5 on Product Hunt</span>
           </div>
         </div>
 
@@ -452,15 +467,15 @@ export default async function Home() {
         <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-4 px-4 sm:flex-row sm:px-6 lg:px-8">
           <p>© {new Date().getFullYear()} Collabdoc Team. All rights reserved.</p>
           <div className="flex gap-6">
-            <a href="#" className="hover:underline">
+            <Link href="/terms" className="hover:underline">
               Terms
-            </a>
-            <a href="#" className="hover:underline">
+            </Link>
+            <Link href="/privacy" className="hover:underline">
               Privacy
-            </a>
-            <a href="#" className="hover:underline">
-              Documentation
-            </a>
+            </Link>
+            <Link href="/help" className="hover:underline">
+              Help
+            </Link>
           </div>
         </div>
       </footer>

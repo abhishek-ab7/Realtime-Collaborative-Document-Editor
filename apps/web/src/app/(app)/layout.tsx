@@ -4,6 +4,8 @@ import { Trash2, Home, Settings } from 'lucide-react';
 import { auth } from '@/lib/auth';
 import { redirect } from 'next/navigation';
 
+import { AppNavigation } from './app-navigation';
+
 interface AppLayoutProps {
   children: React.ReactNode;
 }
@@ -55,38 +57,13 @@ export default async function AppLayout({ children }: AppLayoutProps) {
 
       {/* Main Container */}
       <div className="mx-auto flex w-full max-w-7xl flex-grow">
-        {/* Sidebar Navigation */}
-        <aside className="hidden w-64 flex-col gap-6 border-r border-[#e2e8f0] bg-white/50 p-6 md:flex">
-          <div className="flex flex-col gap-1">
-            <Link
-              href="/dashboard"
-              className="flex items-center gap-3 rounded-xl px-4 py-2.5 text-sm font-medium transition-all hover:bg-[#4f46e5]/5 hover:text-[#4f46e5]"
-            >
-              <Home className="h-4 w-4" />
-              Dashboard
-            </Link>
-            <Link
-              href="/trash"
-              className="flex items-center gap-3 rounded-xl px-4 py-2.5 text-sm font-medium transition-all hover:bg-[#4f46e5]/5 hover:text-[#4f46e5]"
-            >
-              <Trash2 className="h-4 w-4" />
-              Trash
-            </Link>
-          </div>
-
-          <div className="mt-auto border-t border-[#e2e8f0] pt-4">
-            <Link
-              href="/settings"
-              className="flex items-center gap-3 rounded-xl px-4 py-2.5 text-sm font-medium text-slate-500 transition-all hover:bg-[#4f46e5]/5 hover:text-[#4f46e5]"
-            >
-              <Settings className="h-4 w-4" />
-              Settings
-            </Link>
-          </div>
-        </aside>
+        {/* Sidebar / Bottom Navigation */}
+        <AppNavigation />
 
         {/* Content Canvas */}
-        <main className="flex flex-grow flex-col overflow-x-hidden p-6 md:p-8">{children}</main>
+        <main className="flex flex-grow flex-col overflow-x-hidden p-6 pb-24 md:p-8 md:pb-8">
+          {children}
+        </main>
       </div>
 
       {/* Footer */}

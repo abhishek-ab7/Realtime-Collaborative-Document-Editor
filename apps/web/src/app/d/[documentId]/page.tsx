@@ -1,8 +1,8 @@
 import { notFound, redirect } from 'next/navigation';
 import { auth } from '@/lib/auth';
 import { prisma } from '@collabdoc/database';
-import { DocumentEditorClient } from './document-editor-client';
 import { getDocumentRole } from '@/lib/permissions';
+import { DocumentEditorWrapper } from './editor-wrapper';
 
 interface EditorPageProps {
   params: Promise<{ documentId: string }>;
@@ -39,7 +39,7 @@ export default async function EditorPage({ params }: EditorPageProps) {
     });
 
   return (
-    <DocumentEditorClient
+    <DocumentEditorWrapper
       documentId={documentId}
       title={document.title}
       content=""

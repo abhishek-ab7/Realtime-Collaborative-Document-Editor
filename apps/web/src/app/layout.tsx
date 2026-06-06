@@ -1,17 +1,11 @@
 import type { Metadata } from 'next';
-import { Inter, JetBrains_Mono, Geist } from 'next/font/google';
+import { JetBrains_Mono, Geist } from 'next/font/google';
 import './globals.css';
 import { cn } from '@/lib/utils';
 import { SessionProvider } from '@/components/providers/session-provider';
 import { Toaster } from '@/components/ui/sonner';
 
 const geist = Geist({ subsets: ['latin'], variable: '--font-sans' });
-
-const inter = Inter({
-  subsets: ['latin'],
-  variable: '--font-inter',
-  display: 'swap',
-});
 
 const jetbrainsMono = JetBrains_Mono({
   subsets: ['latin'],
@@ -39,9 +33,21 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html
       lang="en"
-      className={cn(inter.variable, jetbrainsMono.variable, 'font-sans', geist.variable)}
+      className={cn(jetbrainsMono.variable, 'font-sans', geist.variable)}
       suppressHydrationWarning
     >
+      <head>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              try {
+                localStorage.removeItem('collabdoc-theme');
+                document.documentElement.classList.remove('dark');
+              } catch (e) {}
+            `,
+          }}
+        />
+      </head>
       <body className="min-h-screen bg-[var(--color-bg-primary)] antialiased">
         <SessionProvider>{children}</SessionProvider>
         <Toaster position="top-right" closeButton richColors />

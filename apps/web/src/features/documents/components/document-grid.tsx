@@ -45,7 +45,7 @@ export function DocumentGrid({
   if (isLoading) {
     return (
       <div
-        className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3"
+        className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3"
         data-testid="document-grid-loading"
       >
         {[...Array(6)].map((_, i) => (
@@ -116,7 +116,7 @@ export function DocumentGrid({
 
   return (
     <div
-      className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3"
+      className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3"
       data-testid="document-grid"
     >
       {documents.map((doc) => (

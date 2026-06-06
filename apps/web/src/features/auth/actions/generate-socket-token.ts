@@ -21,7 +21,7 @@ export async function generateSocketToken(): Promise<string | null> {
   const payload: SocketAuthPayload = {
     userId: session.user.id!,
     email: session.user.email!,
-    name: session.user.name!,
+    name: session.user.name || session.user.email?.split('@')[0] || 'Anonymous',
     avatarUrl: session.user.image ?? null,
   };
 

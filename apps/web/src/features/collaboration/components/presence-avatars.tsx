@@ -1,6 +1,6 @@
 'use client';
 
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { UserAvatar } from '@/components/ui/user-avatar';
 import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from '@/components/ui/tooltip';
 import { PRESENCE_COLORS } from '@collabdoc/shared';
 import { usePresence } from '../hooks/use-presence';
@@ -39,15 +39,13 @@ export function PresenceAvatars() {
                   />
                 }
               >
-                <Avatar className="h-7 w-7 border-2 border-white">
-                  <AvatarImage src={user.avatarUrl ?? undefined} alt={user.name} />
-                  <AvatarFallback
-                    className="text-[10px] font-semibold text-white"
-                    style={{ backgroundColor: color }}
-                  >
-                    {initials}
-                  </AvatarFallback>
-                </Avatar>
+                <UserAvatar
+                  src={user.avatarUrl}
+                  name={user.name}
+                  size={28}
+                  color={color}
+                  className="border-2 border-white"
+                />
                 {/* Online dot */}
                 <div className="absolute -right-0.5 -bottom-0.5 h-2 w-2 rounded-full border border-white bg-green-500" />
               </TooltipTrigger>

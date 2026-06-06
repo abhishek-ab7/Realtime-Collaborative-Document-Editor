@@ -49,6 +49,10 @@ export function useDocumentEditor({
         class:
           'prose prose-slate max-w-none focus:outline-none min-h-[calc(100vh-280px)] px-12 py-8 text-[#0f172a]',
         'data-testid': 'tiptap-editor',
+        spellcheck:
+          typeof window !== 'undefined' && localStorage.getItem('collabdoc-spell-check') === 'false'
+            ? 'false'
+            : 'true',
       },
     },
     onUpdate({ editor, transaction }) {

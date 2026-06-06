@@ -1,4 +1,5 @@
 import { PrismaClient, DocumentStatus, CollaboratorRole, ActivityAction } from '@prisma/client';
+import { createHash } from 'crypto';
 
 const prisma = new PrismaClient();
 
@@ -48,6 +49,34 @@ async function main() {
   });
 
   console.log(`📄 Document created: "${doc.title}" owned by ${john.name}`);
+
+  // Create public demo document
+  const demoDoc = await prisma.document.create({
+    data: {
+      id: 'demo-document',
+      ownerId: john.id,
+      title: 'Public Demo Document',
+      status: DocumentStatus.ACTIVE,
+      isStarred: false,
+      wordCount: 120,
+      lastAccessedAt: new Date(),
+    },
+  });
+
+  const demoTokenHash = createHash('sha256').update('demo-token').digest('hex');
+
+  await prisma.shareLink.create({
+    data: {
+      id: 'demo-share-link',
+      documentId: demoDoc.id,
+      createdBy: john.id,
+      tokenHash: demoTokenHash,
+      permission: 'VIEW',
+      isActive: true,
+    },
+  });
+
+  console.log(`📄 Public Demo Document created with ID "demo-document" and token "demo-token"`);
 
   // Add collaborator
   const collab = await prisma.collaborator.create({

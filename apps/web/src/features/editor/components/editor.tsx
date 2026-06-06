@@ -47,6 +47,29 @@ export function Editor({
   }, [editor, onEditorLoad]);
 
   useEffect(() => {
+    if (!editor || typeof window === 'undefined') return;
+
+    const fontSize = localStorage.getItem('collabdoc-font-size') || '16px';
+    const lineSpacing = localStorage.getItem('collabdoc-line-spacing') || '1.75';
+    const showCursors = localStorage.getItem('collabdoc-presence-cursors') !== 'false';
+
+    const canvas = document.querySelector('.editor-canvas-wrapper');
+    if (canvas) {
+      (canvas as HTMLElement).style.setProperty('--editor-font-size', fontSize);
+      (canvas as HTMLElement).style.setProperty('--editor-line-spacing', lineSpacing);
+    }
+
+    const container = document.querySelector('[data-testid="editor-container"]');
+    if (container) {
+      if (!showCursors) {
+        container.classList.add('hide-presence-cursors');
+      } else {
+        container.classList.remove('hide-presence-cursors');
+      }
+    }
+  }, [editor]);
+
+  useEffect(() => {
     if (!editor || !onCountChange) return;
 
     const updateCounts = () => {
@@ -70,7 +93,7 @@ export function Editor({
 
       <div className="flex-1 overflow-y-auto bg-[var(--color-bg-secondary)]">
         {editor && editable && <EditorBubbleMenu editor={editor} />}
-        <div className="editor-canvas-wrapper mx-auto min-h-full w-full max-w-[860px] border-x border-[var(--color-border-default)] bg-[var(--color-bg-primary)] px-16 py-12 shadow-sm">
+        <div className="editor-canvas-wrapper mx-auto min-h-full w-full max-w-[860px] border-x border-[var(--color-border-default)] bg-[var(--color-bg-primary)] px-4 py-6 shadow-sm md:px-16 md:py-12">
           <EditorContent editor={editor} />
         </div>
       </div>

@@ -24,6 +24,7 @@ import {
   AlignRight,
   Link as LinkIcon,
   ChevronDown,
+  Table as TableIcon,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { LinkDialog } from './link-dialog';
@@ -34,6 +35,32 @@ interface EditorToolbarProps {
 
 export function EditorToolbar({ editor }: EditorToolbarProps) {
   const [linkDialogOpen, setLinkDialogOpen] = useState(false);
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const [showFade, setShowFade] = useState(false);
+
+  const checkScroll = useCallback(() => {
+    const el = scrollContainerRef.current;
+    if (el) {
+      const canScrollRight =
+        el.scrollWidth > el.clientWidth && el.scrollLeft < el.scrollWidth - el.clientWidth - 5;
+      setShowFade(canScrollRight);
+    }
+  }, []);
+
+  useEffect(() => {
+    const el = scrollContainerRef.current;
+    if (el) {
+      checkScroll();
+      el.addEventListener('scroll', checkScroll);
+      window.addEventListener('resize', checkScroll);
+      const timer = setTimeout(checkScroll, 100);
+      return () => {
+        el.removeEventListener('scroll', checkScroll);
+        window.removeEventListener('resize', checkScroll);
+        clearTimeout(timer);
+      };
+    }
+  }, [checkScroll]);
 
   const setLink = useCallback(
     (url: string) => {
@@ -53,27 +80,35 @@ export function EditorToolbar({ editor }: EditorToolbarProps) {
 
   return (
     <>
-      <div
-        data-testid="editor-toolbar"
-        className="relative z-40 flex h-12 w-full shrink-0 items-center gap-1.5 overflow-visible border-b border-[#e2e8f0] bg-white px-3 select-none"
-      >
-        <HistoryGroup editor={editor} />
-        <Divider />
-        <TypographyGroup editor={editor} />
-        <Divider />
-        <MarksGroup editor={editor} />
-        <Divider />
-        <ColorGroup editor={editor} />
-        <Divider />
-        <HeadingGroup editor={editor} />
-        <Divider />
-        <ListGroup editor={editor} />
-        <Divider />
-        <BlockGroup editor={editor} />
-        <Divider />
-        <AlignmentGroup editor={editor} />
-        <Divider />
-        <InsertGroup editor={editor} onInsertLink={() => setLinkDialogOpen(true)} />
+      <div className="relative z-40 w-full shrink-0 border-b border-[#e2e8f0] bg-white">
+        <div
+          ref={scrollContainerRef}
+          data-testid="editor-toolbar"
+          className="flex h-12 w-full scrollbar-none flex-nowrap items-center gap-1.5 overflow-x-auto px-3 select-none [&>button]:h-7 [&>button]:w-7 sm:[&>button]:h-8 sm:[&>button]:w-8 [&>div]:flex-shrink-0 [&>div]:flex-nowrap"
+        >
+          <HistoryGroup editor={editor} />
+          <Divider />
+          <TypographyGroup editor={editor} />
+          <Divider />
+          <MarksGroup editor={editor} />
+          <Divider />
+          <ColorGroup editor={editor} />
+          <Divider />
+          <HeadingGroup editor={editor} />
+          <Divider />
+          <ListGroup editor={editor} />
+          <Divider />
+          <BlockGroup editor={editor} />
+          <Divider />
+          <AlignmentGroup editor={editor} />
+          <Divider />
+          <InsertGroup editor={editor} onInsertLink={() => setLinkDialogOpen(true)} />
+        </div>
+
+        {/* Subtle gradient fade on the right edge */}
+        {showFade && (
+          <div className="pointer-events-none absolute top-0 right-0 bottom-0 z-50 w-12 bg-gradient-to-l from-white via-white/80 to-transparent" />
+        )}
       </div>
 
       <LinkDialog
@@ -119,7 +154,7 @@ function ToolbarButton({
       title={title}
       data-testid={testId}
       className={cn(
-        'flex h-8 w-8 items-center justify-center rounded-md text-[#475569] transition-all duration-100',
+        'flex h-7 w-7 items-center justify-center rounded-md text-[#475569] transition-all duration-100 sm:h-8 sm:w-8',
         'disabled:cursor-not-allowed disabled:opacity-40',
         active
           ? 'bg-[#4f46e5]/10 font-semibold text-[#4f46e5]'
@@ -163,7 +198,7 @@ function Dropdown({
         type="button"
         onClick={() => setIsOpen(!isOpen)}
         className={cn(
-          'flex h-8 items-center justify-between gap-1.5 rounded-md border border-[#e2e8f0] bg-white px-2.5 text-xs font-medium text-[#475569] shadow-xs transition-all hover:bg-[#f1f5f9]',
+          'flex h-7 items-center justify-between gap-1.5 rounded-md border border-[#e2e8f0] bg-white px-2.5 text-xs font-medium text-[#475569] shadow-xs transition-all hover:bg-[#f1f5f9] sm:h-8',
           className,
         )}
       >
@@ -250,7 +285,7 @@ function ColorPicker({
         type="button"
         title={label}
         onClick={() => setIsOpen(!isOpen)}
-        className="flex h-8 w-8 items-center justify-center rounded-md border border-[#e2e8f0] bg-white transition-all hover:bg-[#f1f5f9]"
+        className="flex h-7 w-7 items-center justify-center rounded-md border border-[#e2e8f0] bg-white transition-all hover:bg-[#f1f5f9] sm:h-8 sm:w-8"
       >
         <div className="flex flex-col items-center justify-center">
           {icon}
@@ -570,6 +605,15 @@ function InsertGroup({ editor, onInsertLink }: { editor: Editor; onInsertLink: (
         data-testid="toolbar-link"
       >
         <LinkIcon className="h-[15px] w-[15px]" />
+      </ToolbarButton>
+      <ToolbarButton
+        onClick={() =>
+          editor.chain().focus().insertTable({ rows: 3, cols: 3, withHeaderRow: true }).run()
+        }
+        title="Insert Table"
+        data-testid="toolbar-table"
+      >
+        <TableIcon className="h-[15px] w-[15px]" />
       </ToolbarButton>
     </ToolbarGroup>
   );
