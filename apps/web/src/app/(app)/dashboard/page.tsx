@@ -6,7 +6,7 @@ import { CreateDocumentButton } from '@/features/documents/components/create-doc
 import { DocumentGrid } from '@/features/documents/components/document-grid';
 import { updateDocument, duplicateDocument } from '@/features/documents/actions/document-actions';
 import { Star, Clock } from 'lucide-react';
-import { toast, Toaster } from 'sonner';
+import { toast } from 'sonner';
 
 export default function DashboardPage() {
   const { documents, isLoading, options, setSearch, refresh } = useDocuments({ status: 'ACTIVE' });
@@ -72,8 +72,6 @@ export default function DashboardPage() {
 
   return (
     <div className="flex w-full flex-col space-y-8">
-      <Toaster position="top-right" closeButton richColors />
-
       {/* Header Controls */}
       <div className="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
         <CreateDocumentButton />

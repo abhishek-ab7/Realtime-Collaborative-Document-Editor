@@ -116,6 +116,10 @@ export function EditorHeader({
     }
   }, [isEditing]);
 
+  useEffect(() => {
+    document.title = `${title} — Collabdoc`;
+  }, [title]);
+
   const saveTitle = async (newTitle: string) => {
     const trimmed = newTitle.trim() || 'Untitled Document';
     if (trimmed === initialTitle) return;
@@ -294,6 +298,13 @@ export function EditorHeader({
                 Document Details
               </DropdownMenuItem>
               <DropdownMenuSeparator />
+              <DropdownMenuItem
+                onClick={() => window.print()}
+                disabled={!editor}
+                className="cursor-pointer"
+              >
+                Export as PDF (.pdf)
+              </DropdownMenuItem>
               <DropdownMenuItem
                 onClick={exportAsMarkdown}
                 disabled={!editor}

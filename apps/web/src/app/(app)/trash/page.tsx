@@ -4,7 +4,7 @@ import { useDocuments } from '@/features/documents/hooks/use-documents';
 import { DocumentGrid } from '@/features/documents/components/document-grid';
 import { updateDocument, deleteDocument } from '@/features/documents/actions/document-actions';
 import { Trash2 } from 'lucide-react';
-import { toast, Toaster } from 'sonner';
+import { toast } from 'sonner';
 
 export default function TrashPage() {
   const { documents, isLoading, refresh } = useDocuments({ status: 'TRASHED' });
@@ -33,8 +33,6 @@ export default function TrashPage() {
 
   return (
     <div className="flex w-full flex-col space-y-8">
-      <Toaster position="top-right" closeButton richColors />
-
       {/* Header Info */}
       <div className="flex flex-col gap-2">
         <h1 className="flex items-center gap-2 text-2xl font-bold tracking-tight text-[#131b2e]">

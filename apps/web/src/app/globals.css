@@ -496,13 +496,66 @@ body {
 
 /* Print styles */
 @media print {
-  .editor-toolbar,
+  @page {
+    margin: 0;
+  }
+
+  /* Hide all UI shell elements, radix portals, dropdowns, and overlays */
   header,
-  footer {
+  aside,
+  footer,
+  .editor-toolbar,
+  [data-testid='editor-toolbar'],
+  [data-testid='editor-status-bar'],
+  [data-testid='presence-avatars'],
+  .fixed,
+  .absolute,
+  [data-radix-portal],
+  [role='menu'],
+  [role='menubar'],
+  [role='dialog'],
+  [role='tooltip'],
+  .toaster,
+  div[class*='toaster'] {
     display: none !important;
   }
-  .ProseMirror {
-    padding: 0;
-    min-height: unset;
+
+  /* Reset main containers for printing */
+  html,
+  body {
+    background: #ffffff !important;
+    color: #000000 !important;
+    height: auto !important;
+    overflow: visible !important;
+  }
+
+  body {
+    padding: 1.6cm 2cm !important;
+  }
+
+  /* Target editor container and scroll wrapper */
+  [data-testid='editor-container'],
+  .flex-1 {
+    height: auto !important;
+    overflow: visible !important;
+    display: block !important;
+  }
+
+  /* Remove grey background, borders, and shadows from the canvas container */
+  .editor-canvas-wrapper {
+    max-width: 100% !important;
+    width: 100% !important;
+    border: none !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+    background: transparent !important;
+  }
+
+  /* Format the TipTap text area */
+  .ProseMirror.tiptap {
+    padding: 0 !important;
+    min-height: unset !important;
+    background: transparent !important;
+    color: #000000 !important;
   }
 }

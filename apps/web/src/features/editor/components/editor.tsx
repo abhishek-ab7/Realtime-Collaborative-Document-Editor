@@ -70,7 +70,7 @@ export function Editor({
 
       <div className="flex-1 overflow-y-auto bg-[var(--color-bg-secondary)]">
         {editor && editable && <EditorBubbleMenu editor={editor} />}
-        <div className="mx-auto min-h-full w-full max-w-[860px] border-x border-[var(--color-border-default)] bg-[var(--color-bg-primary)] px-16 py-12 shadow-sm">
+        <div className="editor-canvas-wrapper mx-auto min-h-full w-full max-w-[860px] border-x border-[var(--color-border-default)] bg-[var(--color-bg-primary)] px-16 py-12 shadow-sm">
           <EditorContent editor={editor} />
         </div>
       </div>
