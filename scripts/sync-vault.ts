@@ -60,20 +60,36 @@ function parseJunitReport(filePath: string): { tests: number; failures: number }
 function readCurrentPhase(): { id: string; name: string } {
   const indexPath = path.join(ROOT_DIR, 'docs/02-phases/phase-00-INDEX.md');
   if (!fs.existsSync(indexPath)) {
-    return { id: '09', name: 'Phase 09: Sharing & Permissions (Days 34–39)' };
+    return { id: '10', name: 'Phase 10: Testing, Observability & Deployment (Days 40–49)' };
   }
   const content = fs.readFileSync(indexPath, 'utf8');
   const lines = content.split('\n');
+
+  // First look for the first unchecked phase
   for (const line of lines) {
     const match = line.match(/^-\s*\[\s*\]\s*\[\[02-phases\/(phase-\d+-[^|]+)\|([^\]]+)\]\]/);
     if (match) {
       const phaseFile = match[1];
       const phaseName = match[2].trim();
-      const phaseId = phaseFile.match(/phase-(\d+)/)?.[1] || '09';
+      const phaseId = phaseFile.match(/phase-(\d+)/)?.[1] || '10';
       return { id: phaseId, name: phaseName };
     }
   }
-  return { id: '09', name: 'Phase 09: Sharing & Permissions (Days 34–39)' };
+
+  // If no unchecked phase, look for the last checked phase
+  let lastChecked: { id: string; name: string } | null = null;
+  for (const line of lines) {
+    const match = line.match(/^-\s*\[x\]\s*\[\[02-phases\/(phase-\d+-[^|]+)\|([^\]]+)\]\]/);
+    if (match) {
+      const phaseFile = match[1];
+      const phaseName = match[2].trim();
+      const phaseId = phaseFile.match(/phase-(\d+)/)?.[1] || '10';
+      lastChecked = { id: phaseId, name: `${phaseName} (Completed)` };
+    }
+  }
+
+  if (lastChecked) return lastChecked;
+  return { id: '10', name: 'Phase 10: Testing, Observability & Deployment (Days 40–49)' };
 }
 
 // Helper to get coverage summary percentage
