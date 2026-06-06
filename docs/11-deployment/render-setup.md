@@ -21,7 +21,7 @@ COPY apps/web/package.json ./apps/web/
 COPY packages/database/package.json ./packages/database/
 COPY packages/shared/package.json ./packages/shared/
 COPY packages/yjs-utils/package.json ./packages/yjs-utils/
-RUN npm ci
+RUN NODE_ENV=development npm ci
 
 # Build the project
 FROM base AS builder
