@@ -18,7 +18,7 @@ COPY apps/socket-server/package.json ./apps/socket-server/
 COPY packages/database/package.json ./packages/database/
 COPY packages/shared/package.json ./packages/shared/
 COPY packages/yjs-utils/package.json ./packages/yjs-utils/
-RUN npm ci --workspace=@collabdoc/socket-server --include-workspace-root
+RUN NODE_ENV=development npm ci --workspace=@collabdoc/socket-server --include-workspace-root
 
 # Build the project
 FROM base AS builder
