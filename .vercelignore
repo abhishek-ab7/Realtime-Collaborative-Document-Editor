@@ -1,0 +1,14 @@
+node_modules
+.next
+.turbo
+dist
+build
+coverage
+playwright-report
+test-results
+.git
+.agents
+.playwright-mcp
+.stitch
+docs
+testsprite_tests
