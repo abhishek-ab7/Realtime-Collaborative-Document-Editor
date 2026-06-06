@@ -23,19 +23,21 @@ The project uses a custom `vercel.json` file in the Next.js workspace root (`app
 
 Configure the following environment variables in the Vercel dashboard:
 
-| Variable                 | Description                                             | Value Example                                                |
-| ------------------------ | ------------------------------------------------------- | ------------------------------------------------------------ |
-| `DATABASE_URL`           | Direct connection string for PostgreSQL (Neon/Supabase) | `postgresql://user:password@hostname/dbname?sslmode=require` |
-| `AUTH_SECRET`            | Secret key used to sign Auth.js session cookies         | _Generate via `npx auth secret`_                             |
-| `AUTH_GOOGLE_ID`         | Google OAuth Client ID                                  | `client-id.apps.googleusercontent.com`                       |
-| `AUTH_GOOGLE_SECRET`     | Google OAuth Client Secret                              | `secret-key`                                                 |
-| `AUTH_URL`               | Canonical URL of the production deployment              | `https://collabdoc-web.vercel.app`                           |
-| `NEXT_PUBLIC_SOCKET_URL` | Endpoint of the live Socket.io server                   | `https://collabdoc-socket.railway.app`                       |
-| `SOCKET_AUTH_SECRET`     | Shared JWT signing key for WebSockets                   | _Generate a secure 32+ character string_                     |
-| `GEMINI_API_KEY`         | API Key for Google Gemini AI integrations               | _Your Gemini API Key_                                        |
-| `SENTRY_DSN`             | Sentry DSN for server-side error capturing              | `https://key@sentry.io/project`                              |
-| `NEXT_PUBLIC_SENTRY_DSN` | Sentry DSN for client-side error capturing              | `https://key@sentry.io/project`                              |
-| `NEXT_PUBLIC_APP_URL`    | App public address (used for redirect paths)            | `https://collabdoc-web.vercel.app`                           |
+| Variable                        | Description                                             | Value Example                                                |
+| ------------------------------- | ------------------------------------------------------- | ------------------------------------------------------------ |
+| `DATABASE_URL`                  | Direct connection string for PostgreSQL (Neon/Supabase) | `postgresql://user:password@hostname/dbname?sslmode=require` |
+| `NEXT_PUBLIC_SUPABASE_URL`      | Supabase API connection URL                             | `https://your-project.supabase.co`                           |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Supabase anon/public API key                            | `eyJhbGciOi...`                                              |
+| `AUTH_SECRET`                   | Secret key used to sign Auth.js session cookies         | _Generate via `npx auth secret`_                             |
+| `AUTH_GOOGLE_ID`                | Google OAuth Client ID                                  | `client-id.apps.googleusercontent.com`                       |
+| `AUTH_GOOGLE_SECRET`            | Google OAuth Client Secret                              | `secret-key`                                                 |
+| `AUTH_URL`                      | Canonical URL of the production deployment              | `https://collabdoc-web.vercel.app`                           |
+| `NEXT_PUBLIC_SOCKET_URL`        | Endpoint of the live Socket.io server                   | `https://collabdoc-socket.railway.app`                       |
+| `SOCKET_AUTH_SECRET`            | Shared JWT signing key for WebSockets                   | _Generate a secure 32+ character string_                     |
+| `GEMINI_API_KEY`                | API Key for Google Gemini AI integrations               | _Your Gemini API Key_                                        |
+| `SENTRY_DSN`                    | Sentry DSN for server-side error capturing              | `https://key@sentry.io/project`                              |
+| `NEXT_PUBLIC_SENTRY_DSN`        | Sentry DSN for client-side error capturing              | `https://key@sentry.io/project`                              |
+| `NEXT_PUBLIC_APP_URL`           | App public address (used for redirect paths)            | `https://collabdoc-web.vercel.app`                           |
 
 ## 3. Dynamic Editor Optimization
 

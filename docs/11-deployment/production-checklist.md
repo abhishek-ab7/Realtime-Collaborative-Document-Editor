@@ -10,6 +10,7 @@ This checklist documents the required validation steps before launching the coll
 - [ ] **CORS Origin Boundaries**: Restrict the WebSocket server's `CORS_ORIGIN` to match your Vercel production domain.
 - [ ] **Database Connection Sizing**: Connection pool parameters set correctly (`connection_limit` adjusted to prevent exhaustion).
 - [ ] **Gemini AI Integration**: Confirm that `GEMINI_API_KEY` is set on Vercel to activate the writing assistant in production.
+- [ ] **Supabase Auth Configuration**: Ensure `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY` are defined in production to support OAuth and user sign-in flows.
 
 ## 2. Testing & Quality Gates
 
