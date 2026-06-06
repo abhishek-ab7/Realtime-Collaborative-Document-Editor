@@ -1,0 +1,28 @@
+feat(deploy): implement phase 10 testing, observability & deployment setup
+
+This commit completes the implementation, documentation, and verification of Phase 10 (Testing, Observability & Deployment) for the Collabdoc application.
+
+1. Standalone Socket Server Containerization:
+   - Authored a multi-stage Dockerfile (`apps/socket-server/Dockerfile`) using Node 20 on Alpine for lightweight, production-grade container orchestration.
+   - Built dependency installation stages to selectively compile `@collabdoc/socket-server` workspace and its local dependencies (`@collabdoc/database`, `@collabdoc/shared`, `@collabdoc/yjs-utils`).
+   - Integrated PostgreSQL Prisma client code generation inside the build pipeline.
+
+2. Next.js Monorepo Build Setup:
+   - Configured `apps/web/vercel.json` to allow root workspace compilation via Turborepo filters (`npx turbo build --filter=web`) during deployment on Vercel.
+   - Set workspace root settings and framework presets to guide automated builds.
+
+3. Monitoring & Telemetry Systems:
+   - Documented custom metrics registries under `docs/10-observability/opentelemetry-setup.md` targeting socket rooms, connections, and YJS latency tracking.
+   - Outlined Next.js App Router error capture and client/server tracing integrations under `docs/10-observability/sentry-setup.md`.
+   - Outlined alert limits, response time thresholds, and key indicators under `docs/10-observability/monitoring-dashboards.md`.
+
+4. Deployment Infrastructure Documentation:
+   - Fleshed out database setup instructions (`database-setup.md`), detail connection pooling parameters, SSL parameters, and migration execution steps.
+   - Wrote comprehensive hosting guidelines for Vercel (`vercel-setup.md`) and Railway (`railway-setup.md`).
+   - Formulated a 36-point pre-launch validation checklist (`production-checklist.md`) encompassing security protocols, Lighthouse requirements, cache policies, and uptime ping triggers.
+
+5. Verification & Tests:
+   - Executed full Vitest suite: 210/210 tests passed successfully.
+   - Verified TypeScript compilation: strict checks passed with 0 errors.
+   - Checked Next.js monorepo production builds: compiled successfully.
+   - Ran vault automation sync scripts to compile updated index maps and PROJECT-STATUS.md.
