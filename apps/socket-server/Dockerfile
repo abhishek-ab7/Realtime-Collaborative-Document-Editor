@@ -15,10 +15,6 @@ RUN npm ci --workspace=@collabdoc/socket-server --include-workspace-root
 FROM base AS builder
 WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
-COPY --from=deps /app/apps/socket-server/node_modules ./apps/socket-server/node_modules
-COPY --from=deps /app/packages/database/node_modules ./packages/database/node_modules
-COPY --from=deps /app/packages/shared/node_modules ./packages/shared/node_modules
-COPY --from=deps /app/packages/yjs-utils/node_modules ./packages/yjs-utils/node_modules
 COPY . .
 RUN cd packages/database && npx prisma generate
 RUN cd apps/socket-server && npm run build
@@ -28,10 +24,9 @@ FROM base AS runner
 WORKDIR /app
 ENV NODE_ENV production
 
-# Copy built files
+# Copy built files and the hoisted node_modules (containing the generated Prisma Client)
 COPY --from=builder /app/apps/socket-server/dist ./dist
 COPY --from=builder /app/node_modules ./node_modules
-COPY --from=builder /app/packages/database/node_modules/.prisma ./node_modules/.prisma
 
 EXPOSE 3001
 CMD ["node", "dist/index.js"]
