@@ -15,10 +15,11 @@ FROM base AS deps
 WORKDIR /app
 COPY package.json package-lock.json ./
 COPY apps/socket-server/package.json ./apps/socket-server/
+COPY apps/web/package.json ./apps/web/
 COPY packages/database/package.json ./packages/database/
 COPY packages/shared/package.json ./packages/shared/
 COPY packages/yjs-utils/package.json ./packages/yjs-utils/
-RUN NODE_ENV=development npm ci --workspace=@collabdoc/socket-server --include-workspace-root
+RUN npm ci
 
 # Build the project
 FROM base AS builder
@@ -27,6 +28,8 @@ COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 RUN cd packages/database && npx prisma generate
 RUN cd apps/socket-server && npm run build
+# Prune devDependencies to keep the production image small
+RUN npm prune --omit=dev --workspace=@collabdoc/socket-server --include-workspace-root
 
 # Production image
 FROM base AS runner
