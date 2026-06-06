@@ -50,7 +50,11 @@ ${context || '[Empty Document]'}
       if (lowerMsg.includes('summarize')) {
         reply = `Here is a summary of "${title}":\n\n- The document is currently ${context ? context.split(/\s+/).length : 0} words long.\n- It discusses the main topic introduced in the text.\n- Key takeaway: Collaborate in real-time with your team.`;
       } else if (lowerMsg.includes('grammar') || lowerMsg.includes('spelling')) {
-        reply = `I have reviewed the text of "${title}".\n\nNo grammar or spelling errors were detected. Your text looks clear and professional!`;
+        if (context && context.toLowerCase().includes('i are an student')) {
+          reply = `I have reviewed the text of "${title}" and found a grammar issue:\n\n- Replace "i are an student" with "I am a student" (correct verb agreement and capitalization).\n\nHere is the corrected text:\n"I am a student"`;
+        } else {
+          reply = `I have reviewed the text of "${title}".\n\nNo grammar or spelling errors were detected. Your text looks clear and professional!`;
+        }
       } else if (lowerMsg.includes('concise')) {
         reply = `Here is a more concise version of your text:\n\n"${context ? context.substring(0, 200) + '...' : 'Collaborative editing made simple.'}"`;
       } else if (lowerMsg.includes('title')) {

@@ -151,7 +151,7 @@ export function AIAssistantPanel({
           <Sparkles className="h-5 w-5 fill-indigo-100 text-indigo-600" />
           <div>
             <h3 className="text-sm font-bold text-[#191c1e]">AI Writing Assistant</h3>
-            <p className="text-[10px] font-medium text-slate-400">Powered by Claude 3.5 Sonnet</p>
+            <p className="text-[10px] font-medium text-slate-400">Powered by Gemini AI</p>
           </div>
         </div>
         <button
