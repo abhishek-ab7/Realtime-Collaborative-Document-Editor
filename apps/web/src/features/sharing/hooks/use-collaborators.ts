@@ -39,7 +39,9 @@ export function useCollaborators(documentId: string) {
   }, [documentId]);
 
   useEffect(() => {
-    fetchCollaborators();
+    Promise.resolve().then(() => {
+      fetchCollaborators();
+    });
   }, [fetchCollaborators]);
 
   const addCollaborator = useCallback(

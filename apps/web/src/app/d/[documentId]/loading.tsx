@@ -4,7 +4,7 @@ export default function EditorLoading() {
   return (
     <div className="flex min-h-screen flex-col bg-white">
       {/* Header Skeleton */}
-      <div className="sticky top-0 z-40 flex h-14 items-center justify-between border-b border-[#e2e8f0] bg-white/95 px-4">
+      <div className="sticky top-0 z-50 flex h-14 items-center justify-between border-b border-[#e2e8f0] bg-white/95 px-4">
         <div className="flex items-center gap-3">
           <Skeleton className="h-8 w-8 rounded-lg" />
           <Skeleton className="h-5 w-48 rounded-md" />
@@ -17,7 +17,7 @@ export default function EditorLoading() {
       </div>
 
       {/* Toolbar Skeleton */}
-      <div className="sticky top-14 z-30 flex items-center gap-1 border-b border-[#e2e8f0] bg-white/95 px-4 py-2">
+      <div className="sticky top-14 z-40 flex items-center gap-1 border-b border-[#e2e8f0] bg-white/95 px-4 py-2">
         {Array.from({ length: 18 }).map((_, i) => (
           <Skeleton key={i} className="h-8 w-8 rounded-md" />
         ))}

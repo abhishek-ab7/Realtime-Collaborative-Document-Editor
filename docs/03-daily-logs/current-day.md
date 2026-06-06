@@ -1,37 +1,30 @@
-# Daily Log — 2026-06-05
+# Daily Log — 2026-06-06
 
-## What was in progress & completed
+## What was completed
 
-- **Phase 06 — Live Presence & Cursors**:
-  - Implemented 30 Hz trailing-edge throttling for server awareness events in `apps/socket-server/src/handlers/awareness.ts` and room departure cleanup in `apps/socket-server/src/handlers/room.ts`.
-  - Built custom client-side presence logic using `usePresence` hook in `apps/web/src/features/collaboration/hooks/use-presence.ts`.
-  - Designed TipTap document activity tracking for debounced `isTyping` awareness state in `apps/web/src/features/editor/hooks/use-editor.ts`.
-  - Implemented client UI stacked avatars (`PresenceAvatars`), animated typing dots (`TypingIndicator`), room join/leave toast signals, and CSS transitions.
-  - Fully verified using a multi-package testing suite (17 tests in `socket-server` + 55 tests in `web` passing cleanly), zero ESLint warnings/errors, and successful Next.js production builds.
-  - Created Phase 06 final completion notes.
-
-- **Phase 07 — Persistence & Offline Support**:
-  - Configured custom `y-indexeddb` connection wrapper (`OfflinePersistence`) inside the client to initialize local state before socket server updates connect.
-  - Added LRU local cache for IndexedDB (evicts old DBs when client crosses 20 items).
-  - Wired document saving trigger dynamically with word count calculations.
-  - Designed the `SaveStatus` indicator component (Saving / Saved / Offline states).
-  - Added warning guardrails preventing user from closing browser tabs while saving updates to the database.
-  - Added `OfflineBanner` displaying connection status interruptions.
-
-- **Phase 08 — Version History**:
-  - Updated `DocumentVersion` model in `prisma.schema` to track `wordCount` and save triggers (`MANUAL`, `AUTO_30MIN`, `RESTORE_BACKUP`).
-  - Added a backend `VersionManager` in the socket server process, executing background backups on active rooms every 30 minutes.
-  - Formulated Myers word-level text comparison algorithms using `diff` in `packages/shared`.
-  - Developed GET version listings, GET version details, GET version diffs, and POST version restorations routes in Next.js.
-  - Built sliding `VersionPanel` sidebar and `VersionDiffViewer` modal using radix UI layout patterns.
-  - Decoupled heavy diff/history database transactions away from the real-time Socket connection loop.
+- **Editor UI Overhaul & Command Center Toolbar**:
+  - Implemented a full-screen fluid editor workspace by updating `apps/web/src/app/d/[documentId]/document-editor-client.tsx` to `h-screen w-full flex flex-col overflow-hidden` and aligning container widths.
+  - Centered the text editor writing canvas inside `apps/web/src/features/editor/components/editor.tsx` to a comfortable reading max-width of `860px` with a distinct card layout, shadow, and borders, separate from the full-bleed toolbar chrome.
+  - Rebuilt `apps/web/src/features/editor/components/editor-toolbar.tsx` from scratch as a modular sticky top toolbar (Option C - Command Center) spanning 100% viewport width, housing 9 distinct tool groups:
+    - **HistoryGroup**: Undo, Redo.
+    - **TypographyGroup**: Font Family select dropdown (Inter, Georgia, Courier New, Playfair Display) & Font Size select dropdown (10px – 72px).
+    - **MarksGroup**: Bold, Italic, Underline, Strikethrough.
+    - **ColorGroup**: Text color and Highlight color picker with custom floating popover swatch grid + native custom color input.
+    - **HeadingGroup**: Heading levels 1-3 + normal paragraph text toggle.
+    - **ListGroup**: Bullet list, ordered list, task list.
+    - **BlockGroup**: Blockquote, code block.
+    - **AlignmentGroup**: Align Left, Align Center, Align Right.
+    - **InsertGroup**: Dialog-based Link insertion.
+  - Created a custom `FontSize` extension in `apps/web/src/features/editor/lib/extensions.ts` to apply custom font sizes on `textStyle` marks, complete with proper TypeScript global interface declaration typings.
+  - Created the `EditorStatusBar` component in `apps/web/src/features/editor/components/editor-status-bar.tsx` showing word counts, character counts, Yjs room presence counts, and active connectivity state (`Synced`, `Syncing...`, `Offline`).
+  - Resolved monorepo `@tiptap/` dependency versioning typings conflicts by locking all packages to exact version `3.25.0` in `apps/web/package.json` and running `npm dedupe` globally.
+  - Verified 210/210 tests passing green and typechecks compiling clean.
 
 ## Today's Focus
 
-- Mark Phase 7 and Phase 8 as completed.
-- Update Obsidian vault specifications and summaries.
-- Prepare implementation specifications for Phase 09 (Sharing & Permissions).
-- Commented out Playwright browser installation and E2E tests from the CI/CD pipeline (`.github/workflows/ci.yml`) to optimize runner performance and keep E2E tests local-only.
+- Implement the UI overhaul and rich text formatting options requested by the user.
+- Eliminate dependency conflicts and typescript errors on compilation.
+- Refactor the editor layout to follow the "comfortable text, full-width chrome" pattern.
 
 ## Blockers
 
@@ -39,7 +32,4 @@
 
 **Related Links:**
 
-- [[02-phases/phase-07-persistence|Phase 07: Persistence & Offline Support Specification]]
-- [[02-phases/phase-07-COMPLETE|Phase 07: Completion Notes]]
-- [[02-phases/phase-08-versions|Phase 08: Version History Specification]]
-- [[02-phases/phase-08-COMPLETE|Phase 08: Completion Notes]]
+- [[04-architecture/editor-toolbar-design|Editor Toolbar Design Documentation]]

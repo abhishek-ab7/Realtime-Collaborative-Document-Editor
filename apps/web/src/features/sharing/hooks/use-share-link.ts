@@ -36,7 +36,9 @@ export function useShareLink(documentId: string) {
   }, [documentId]);
 
   useEffect(() => {
-    fetchLinks();
+    Promise.resolve().then(() => {
+      fetchLinks();
+    });
   }, [fetchLinks]);
 
   const generateLink = useCallback(

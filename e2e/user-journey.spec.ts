@@ -33,7 +33,7 @@ test.describe('User Journey E2E', () => {
     await expect(docCard).toBeVisible();
 
     // 5. Move to trash
-    await page.waitForTimeout(1000);
+    await page.waitForTimeout(2000);
     await docCard.dispatchEvent('contextmenu');
     const moveToTrashItem = page.locator('[role="menuitem"]:has-text("Move to trash")');
     await expect(moveToTrashItem).toBeVisible();

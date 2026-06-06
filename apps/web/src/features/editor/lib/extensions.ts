@@ -1,3 +1,4 @@
+import { Extension } from '@tiptap/core';
 import StarterKit from '@tiptap/starter-kit';
 import Placeholder from '@tiptap/extension-placeholder';
 import CharacterCount from '@tiptap/extension-character-count';
@@ -12,11 +13,67 @@ import CodeBlockLowlight from '@tiptap/extension-code-block-lowlight';
 import HorizontalRule from '@tiptap/extension-horizontal-rule';
 import Collaboration from '@tiptap/extension-collaboration';
 import CollaborationCaret from '@tiptap/extension-collaboration-caret';
+import { TextStyle } from '@tiptap/extension-text-style';
+import Color from '@tiptap/extension-color';
+import FontFamily from '@tiptap/extension-font-family';
 import { common, createLowlight } from 'lowlight';
 import type * as Y from 'yjs';
 import type { Awareness } from 'y-protocols/awareness';
 
 const lowlight = createLowlight(common);
+
+export const FontSize = Extension.create({
+  name: 'fontSize',
+  addOptions() {
+    return {
+      types: ['textStyle'],
+    };
+  },
+  addGlobalAttributes() {
+    return [
+      {
+        types: this.options.types,
+        attributes: {
+          fontSize: {
+            default: null,
+            parseHTML: (element) => element.style.fontSize?.replace('px', '') ?? null,
+            renderHTML: (attributes) => {
+              if (!attributes.fontSize) {
+                return {};
+              }
+              return {
+                style: `font-size: ${attributes.fontSize}px`,
+              };
+            },
+          },
+        },
+      },
+    ];
+  },
+  addCommands() {
+    return {
+      setFontSize:
+        (fontSize: string) =>
+        ({ chain }) => {
+          return chain().setMark('textStyle', { fontSize }).run();
+        },
+      unsetFontSize:
+        () =>
+        ({ chain }) => {
+          return chain().setMark('textStyle', { fontSize: null }).run();
+        },
+    };
+  },
+});
+
+declare module '@tiptap/core' {
+  interface Commands<ReturnType> {
+    fontSize: {
+      setFontSize: (size: string) => ReturnType;
+      unsetFontSize: () => ReturnType;
+    };
+  }
+}
 
 interface ExtensionOptions {
   /** Y.Doc for collaborative editing mode */
@@ -72,6 +129,10 @@ export function getEditorExtensions(options?: ExtensionOptions) {
     TaskItem.configure({ nested: true }),
     CodeBlockLowlight.configure({ lowlight }),
     HorizontalRule,
+    TextStyle,
+    Color.configure({ types: ['textStyle'] }),
+    FontFamily.configure({ types: ['textStyle'] }),
+    FontSize,
   ];
 
   // Add collaboration extensions when Y.Doc is provided

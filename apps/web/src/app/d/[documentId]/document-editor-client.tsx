@@ -13,8 +13,10 @@ import { PRESENCE_COLORS, canEditDocument } from '@collabdoc/shared';
 import { useVersions, VersionItem } from '@/features/editor/hooks/use-versions';
 import { VersionPanel } from '@/features/editor/components/version-history/version-panel';
 import { VersionDiffViewer } from '@/features/editor/components/version-history/version-diff';
+import { CommentsSidebar } from '@/features/editor/components/comments-sidebar';
 import { useState } from 'react';
 import type { DocumentRole } from '@/lib/permissions';
+import type { Editor as TipTapEditor } from '@tiptap/react';
 
 interface DocumentEditorClientProps {
   documentId: string;
@@ -52,8 +54,31 @@ function CollaborativeEditor({
   const editable = canEditDocument(role);
 
   // Versions State
-  const versionsHook = useVersions(documentId);
+  const [editor, setEditor] = useState<TipTapEditor | null>(null);
+  const [isCommentsOpen, setIsCommentsOpen] = useState(false);
+  const [commentsTab, setCommentsTab] = useState<'comments' | 'history' | 'analytics' | 'settings'>(
+    'comments',
+  );
+  const versionsHook = useVersions(documentId, isCommentsOpen && commentsTab === 'history');
   const [diffVersion, setDiffVersion] = useState<VersionItem | null>(null);
+  const [commentCount, setCommentCount] = useState(0);
+  const [wordCount, setWordCount] = useState(0);
+  const [charCount, setCharCount] = useState(0);
+
+  useEffect(() => {
+    if (!doc) return;
+    const yComments = doc.getArray('comments');
+    const observer = () => {
+      setCommentCount(yComments.length);
+    };
+    yComments.observe(observer);
+    Promise.resolve().then(() => {
+      setCommentCount(yComments.length);
+    });
+    return () => {
+      yComments.unobserve(observer);
+    };
+  }, [doc]);
 
   // Push local user info into awareness once connected
   useEffect(() => {
@@ -89,7 +114,7 @@ function CollaborativeEditor({
   // Loading state until socket sync
   if (!doc) {
     return (
-      <div className="flex min-h-screen flex-col bg-white">
+      <div className="bg-background flex h-screen w-full flex-col overflow-hidden">
         <EditorHeader documentId={documentId} title={title} role={role} />
         <main className="flex flex-1 items-center justify-center">
           <div className="flex flex-col items-center gap-3">
@@ -102,12 +127,15 @@ function CollaborativeEditor({
   }
 
   return (
-    <div className="flex min-h-screen flex-col bg-white">
+    <div className="bg-background flex h-screen w-full flex-col overflow-hidden">
       <EditorHeader
         documentId={documentId}
         title={title}
         onOpenHistory={versionsHook.togglePanel}
+        onOpenComments={() => setIsCommentsOpen(!isCommentsOpen)}
         role={role}
+        commentCount={commentCount}
+        editor={editor}
       />
 
       {/* Offline warning banner */}
@@ -123,14 +151,33 @@ function CollaborativeEditor({
       )}
 
       <main className="relative flex flex-1 overflow-hidden">
-        <div className="mx-auto flex h-full w-full max-w-5xl flex-1 flex-col">
+        <div className="flex h-full min-w-0 flex-1 flex-col">
           <Editor
             editable={editable}
             yjsDoc={doc}
             awareness={awareness ?? undefined}
             user={{ name: userName, color: userColor }}
+            onCountChange={(words, chars) => {
+              setWordCount(words);
+              setCharCount(chars);
+            }}
+            onEditorLoad={setEditor}
           />
         </div>
+
+        <CommentsSidebar
+          isOpen={isCommentsOpen}
+          onClose={() => setIsCommentsOpen(false)}
+          userName={userName}
+          userImage={userImage}
+          versions={versionsHook.versions}
+          onRestoreVersion={versionsHook.restoreVersion}
+          wordCount={wordCount}
+          charCount={charCount}
+          documentRole={role}
+          activeTab={commentsTab}
+          onActiveTabChange={setCommentsTab}
+        />
 
         <VersionPanel
           documentId={documentId}

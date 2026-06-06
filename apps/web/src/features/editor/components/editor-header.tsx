@@ -2,9 +2,8 @@
 
 import { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
-import { ArrowLeft, MoreHorizontal, Share2, History, Eye } from 'lucide-react';
+import { ArrowLeft, MoreHorizontal, History } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 import { updateDocument } from '@/features/documents/actions/document-actions';
 import { toast } from 'sonner';
@@ -15,21 +14,33 @@ import { ConnectionStatus } from '@/features/collaboration/components/connection
 import { ShareDialog } from '@/features/sharing/components/share-dialog';
 import { canRenameDocument } from '@collabdoc/shared';
 import type { DocumentRole } from '@/lib/permissions';
+import type { Editor } from '@tiptap/react';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 
 interface EditorHeaderProps {
   documentId: string;
   title: string;
-  wordCount?: number;
-  characterCount?: number;
+  commentCount?: number;
   onOpenHistory?: () => void;
+  onOpenComments?: () => void;
   role?: DocumentRole;
+  editor?: Editor | null;
 }
 
 export function EditorHeader({
   documentId,
   title: initialTitle,
+  commentCount,
   onOpenHistory,
+  onOpenComments,
   role = 'OWNER',
+  editor,
 }: EditorHeaderProps) {
   const [title, setTitle] = useState(initialTitle);
   const [isEditing, setIsEditing] = useState(false);
@@ -37,6 +48,66 @@ export function EditorHeader({
   const inputRef = useRef<HTMLInputElement>(null);
 
   const canRename = canRenameDocument(role);
+
+  const exportAsText = () => {
+    if (!editor) return;
+    const text = editor.getText();
+    const blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `${title || 'document'}.txt`;
+    a.click();
+    URL.revokeObjectURL(url);
+    toast.success('Document exported as Plain Text');
+  };
+
+  const exportAsMarkdown = () => {
+    if (!editor) return;
+    const text = editor.getText();
+    const blob = new Blob([text], { type: 'text/markdown;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `${title || 'document'}.md`;
+    a.click();
+    URL.revokeObjectURL(url);
+    toast.success('Document exported as Markdown');
+  };
+
+  const exportAsHTML = () => {
+    if (!editor) return;
+    const html = editor.getHTML();
+    const blob = new Blob([html], { type: 'text/html;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `${title || 'document'}.html`;
+    a.click();
+    URL.revokeObjectURL(url);
+    toast.success('Document exported as HTML');
+  };
+
+  const trashDocument = async () => {
+    if (confirm('Are you sure you want to move this document to Trash?')) {
+      try {
+        await updateDocument(documentId, { status: 'TRASHED' });
+        toast.success('Document moved to trash');
+        window.location.href = '/dashboard';
+      } catch {
+        toast.error('Failed to trash document');
+      }
+    }
+  };
+
+  const showDetails = () => {
+    if (!editor) return;
+    const words = editor.storage.characterCount?.words?.() ?? 0;
+    const chars = editor.storage.characterCount?.characters?.() ?? 0;
+    toast(`Document Info: "${title}"`, {
+      description: `Access Role: ${role || 'VIEWER'} | Words: ${words} | Characters: ${chars}`,
+    });
+  };
 
   useEffect(() => {
     if (isEditing && inputRef.current) {
@@ -80,94 +151,187 @@ export function EditorHeader({
 
   return (
     <>
-      <header className="sticky top-0 z-40 border-b border-[#e2e8f0] bg-white/95 backdrop-blur-sm">
-        <div className="mx-auto flex h-14 max-w-5xl items-center justify-between gap-4 px-4">
-          {/* Left: Back + Title */}
-          <div className="flex min-w-0 flex-1 items-center gap-3">
-            <Link
-              href="/dashboard"
-              className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-[#94a3b8] transition-all hover:bg-[#f1f5f9] hover:text-[#0f172a]"
-              title="Back to Dashboard"
+      <header className="sticky top-0 z-50 flex h-16 w-full shrink-0 items-center justify-between border-b border-[#e2e8f0] bg-white px-10">
+        {/* Left Section: Back, Brand Logo, Title & Menus */}
+        <div className="flex min-w-0 flex-1 items-center gap-6">
+          <Link
+            href="/dashboard"
+            className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-[#94a3b8] transition-all hover:bg-[#f1f5f9] hover:text-[#0f172a]"
+            title="Back to Dashboard"
+          >
+            <ArrowLeft className="h-4 w-4" />
+          </Link>
+
+          {/* Logo */}
+          <div className="flex shrink-0 items-center gap-2">
+            <svg
+              className="h-6 w-6 text-[#3525cd]"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
             >
-              <ArrowLeft className="h-4 w-4" />
-            </Link>
+              <path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z" />
+              <path d="M14 2v4a2 2 0 0 0 2 2h4" />
+            </svg>
+            <span className="text-lg font-bold text-[#3525cd]">Collabdoc</span>
+          </div>
 
-            {isEditing ? (
-              <input
-                ref={inputRef}
-                value={title}
-                onChange={(e) => setTitle(e.target.value)}
-                onBlur={handleBlur}
-                onKeyDown={handleKeyDown}
-                placeholder="Untitled Document"
-                aria-label="Rename Document"
-                className="min-w-0 flex-1 rounded-md border border-[#4f46e5] bg-white px-2 py-0.5 text-base font-semibold text-[#0f172a] outline-none focus:ring-2 focus:ring-[#4f46e5]/20"
-                data-testid="title-input"
-              />
-            ) : (
-              <button
-                type="button"
-                onClick={handleTitleClick}
-                disabled={!canRename}
-                className={cn(
-                  'min-w-0 flex-1 truncate rounded-md px-2 py-0.5 text-left text-base font-semibold text-[#0f172a]',
-                  canRename ? 'cursor-pointer transition-all hover:bg-[#f8fafc]' : 'cursor-default',
-                )}
-                title={canRename ? 'Click to rename' : 'View only — cannot rename'}
-                data-testid="document-title"
-              >
-                {title}
-              </button>
-            )}
+          {/* Title & Document Menu */}
+          <div className="flex min-w-0 flex-col">
+            <div className="flex items-center gap-2">
+              {isEditing ? (
+                <input
+                  ref={inputRef}
+                  value={title}
+                  onChange={(e) => setTitle(e.target.value)}
+                  onBlur={handleBlur}
+                  onKeyDown={handleKeyDown}
+                  placeholder="Untitled Document"
+                  aria-label="Rename Document"
+                  className="min-w-0 rounded-md border border-[#4f46e5] bg-white px-2 py-0.5 text-sm font-semibold text-[#0f172a] outline-none focus:ring-2 focus:ring-[#4f46e5]/20"
+                  data-testid="title-input"
+                />
+              ) : (
+                <button
+                  type="button"
+                  onClick={handleTitleClick}
+                  disabled={!canRename}
+                  className={cn(
+                    'min-w-0 truncate rounded-md px-2 py-0.5 text-left text-sm font-bold text-[#191c1e]',
+                    canRename
+                      ? 'cursor-pointer transition-all hover:bg-[#f8fafc]'
+                      : 'cursor-default',
+                  )}
+                  title={canRename ? 'Click to rename' : 'View only — cannot rename'}
+                  data-testid="document-title"
+                >
+                  {title}
+                </button>
+              )}
+            </div>
+          </div>
+        </div>
 
-            {/* View-only badge for non-editors */}
-            {role === 'VIEWER' && (
-              <Badge
-                variant="secondary"
-                className="shrink-0 gap-1 text-xs text-[#d97706]"
-                data-testid="view-only-badge"
-              >
-                <Eye className="h-3 w-3" />
-                View only
-              </Badge>
-            )}
-
+        {/* Right Section: Statuses, Avatars, History, Share, User Profile */}
+        <div className="flex shrink-0 items-center gap-4">
+          <div className="mr-1.5 flex shrink-0 items-center gap-2">
             <ConnectionStatus />
             <SaveStatus />
             <TypingIndicator />
           </div>
+          <PresenceAvatars />
 
-          {/* Right: Actions */}
-          <div className="flex shrink-0 items-center gap-4">
-            <PresenceAvatars />
-            {onOpenHistory && (
-              <Button
-                variant="ghost"
-                size="sm"
-                className="hidden gap-1.5 text-slate-500 hover:text-slate-900 sm:flex"
-                onClick={onOpenHistory}
-              >
-                <History className="h-4 w-4" />
-              </Button>
-            )}
-            <Button
-              variant="outline"
-              size="sm"
-              className="hidden gap-1.5 sm:flex"
-              onClick={() => setIsShareOpen(true)}
-              data-testid="share-button"
-            >
-              <Share2 className="h-3.5 w-3.5" />
-              Share
-            </Button>
+          {onOpenHistory && (
             <button
               type="button"
-              className="flex h-8 w-8 items-center justify-center rounded-lg text-[#94a3b8] transition-all hover:bg-[#f1f5f9] hover:text-[#0f172a]"
+              onClick={onOpenHistory}
+              className="cursor-pointer rounded-full p-2 text-[#464555] transition-colors hover:bg-[#eceef0] active:opacity-80"
+              title="Version History"
+            >
+              <History className="h-5 w-5" />
+            </button>
+          )}
+
+          <button
+            type="button"
+            onClick={onOpenComments}
+            className="relative cursor-pointer rounded-full p-2 text-[#464555] transition-colors hover:bg-[#eceef0] active:opacity-80"
+            title="Comments"
+          >
+            <svg
+              className="h-5 w-5"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+            </svg>
+            {commentCount !== undefined && commentCount > 0 && (
+              <span className="absolute top-1 right-1 flex h-4 w-4 scale-90 items-center justify-center rounded-full bg-[#ef4444] text-[8px] leading-none font-bold text-white ring-1 ring-white">
+                {commentCount}
+              </span>
+            )}
+          </button>
+
+          <Button
+            variant="default"
+            size="sm"
+            onClick={() => setIsShareOpen(true)}
+            className="flex cursor-pointer items-center gap-2 rounded-lg bg-[#4f46e5] px-4 py-2 font-medium text-white transition-colors hover:bg-[#4f46e5]/90"
+            data-testid="share-button"
+          >
+            <svg
+              className="h-4 w-4"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2.5"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+              <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+            </svg>
+            Share
+          </Button>
+
+          <DropdownMenu>
+            <DropdownMenuTrigger
+              type="button"
+              className="cursor-pointer rounded-full p-1.5 text-[#464555] transition-colors outline-none hover:bg-[#eceef0] active:opacity-80"
               data-testid="more-button"
             >
-              <MoreHorizontal className="h-4 w-4" />
-            </button>
-          </div>
+              <MoreHorizontal className="h-5 w-5" />
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-56">
+              <DropdownMenuItem onClick={showDetails} disabled={!editor} className="cursor-pointer">
+                Document Details
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem
+                onClick={exportAsMarkdown}
+                disabled={!editor}
+                className="cursor-pointer"
+              >
+                Export as Markdown (.md)
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={exportAsHTML}
+                disabled={!editor}
+                className="cursor-pointer"
+              >
+                Export as HTML (.html)
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={exportAsText}
+                disabled={!editor}
+                className="cursor-pointer"
+              >
+                Export as Plain Text (.txt)
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => window.print()} className="cursor-pointer">
+                Print Document
+              </DropdownMenuItem>
+              {role === 'OWNER' && (
+                <>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem
+                    onClick={trashDocument}
+                    variant="destructive"
+                    className="cursor-pointer"
+                  >
+                    Move to Trash
+                  </DropdownMenuItem>
+                </>
+              )}
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       </header>
 

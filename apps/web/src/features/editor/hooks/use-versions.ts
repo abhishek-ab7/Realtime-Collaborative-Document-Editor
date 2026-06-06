@@ -22,14 +22,15 @@ const fetcher = (url: string) =>
     return res.json();
   });
 
-export function useVersions(documentId: string) {
+export function useVersions(documentId: string, shouldFetchExternally?: boolean) {
   const [isOpen, setIsOpen] = useState(false);
+  const shouldFetch = isOpen || shouldFetchExternally;
   const {
     data: versions,
     error,
     mutate,
     isLoading,
-  } = useSWR<VersionItem[]>(isOpen ? `/api/documents/${documentId}/versions` : null, fetcher);
+  } = useSWR<VersionItem[]>(shouldFetch ? `/api/documents/${documentId}/versions` : null, fetcher);
 
   const togglePanel = useCallback(() => setIsOpen((prev) => !prev), []);
 

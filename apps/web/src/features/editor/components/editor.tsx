@@ -1,10 +1,11 @@
 'use client';
 
-import { EditorContent } from '@tiptap/react';
+import { useEffect } from 'react';
+import { EditorContent, Editor as TipTapEditor } from '@tiptap/react';
 import { useDocumentEditor } from '../hooks/use-editor';
 import { EditorToolbar } from './editor-toolbar';
 import { EditorBubbleMenu } from './editor-bubble-menu';
-import { WordCount } from './word-count';
+import { EditorStatusBar } from './editor-status-bar';
 import type * as Y from 'yjs';
 import type { Awareness } from 'y-protocols/awareness';
 
@@ -12,6 +13,8 @@ interface EditorProps {
   content?: string;
   editable?: boolean;
   onUpdate?: (content: string) => void;
+  onCountChange?: (words: number, characters: number) => void;
+  onEditorLoad?: (editor: TipTapEditor) => void;
   /** Collaborative mode props */
   yjsDoc?: Y.Doc;
   awareness?: Awareness;
@@ -22,6 +25,8 @@ export function Editor({
   content = '',
   editable = true,
   onUpdate,
+  onCountChange,
+  onEditorLoad,
   yjsDoc,
   awareness,
   user,
@@ -35,20 +40,42 @@ export function Editor({
     user,
   });
 
+  useEffect(() => {
+    if (editor && onEditorLoad) {
+      onEditorLoad(editor);
+    }
+  }, [editor, onEditorLoad]);
+
+  useEffect(() => {
+    if (!editor || !onCountChange) return;
+
+    const updateCounts = () => {
+      const words = editor.storage.characterCount?.words?.() ?? 0;
+      const chars = editor.storage.characterCount?.characters?.() ?? 0;
+      onCountChange(words, chars);
+    };
+
+    editor.on('update', updateCounts);
+    // Initial run
+    updateCounts();
+
+    return () => {
+      editor.off('update', updateCounts);
+    };
+  }, [editor, onCountChange]);
+
   return (
-    <div className="flex h-full flex-col" data-testid="editor-container">
+    <div className="flex h-full w-full flex-col overflow-hidden" data-testid="editor-container">
       {editable && <EditorToolbar editor={editor} />}
 
-      <div className="flex-1 overflow-auto">
+      <div className="flex-1 overflow-y-auto bg-[var(--color-bg-secondary)]">
         {editor && editable && <EditorBubbleMenu editor={editor} />}
-        <EditorContent editor={editor} />
+        <div className="mx-auto min-h-full w-full max-w-[860px] border-x border-[var(--color-border-default)] bg-[var(--color-bg-primary)] px-16 py-12 shadow-sm">
+          <EditorContent editor={editor} />
+        </div>
       </div>
 
-      {editable && (
-        <div className="sticky bottom-0 flex items-center justify-end border-t border-[#f1f5f9] bg-white/80 px-12 py-2 backdrop-blur-sm">
-          <WordCount editor={editor} />
-        </div>
-      )}
+      {editable && <EditorStatusBar editor={editor} />}
     </div>
   );
 }

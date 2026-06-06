@@ -25,8 +25,10 @@ vi.mock('../components/editor-bubble-menu', () => ({
   EditorBubbleMenu: () => <div data-testid="editor-bubble-menu" />,
 }));
 
-vi.mock('../components/word-count', () => ({
-  WordCount: ({ editor }: any) => <div data-testid="word-count" data-editor-exists={!!editor} />,
+vi.mock('../components/editor-status-bar', () => ({
+  EditorStatusBar: ({ editor }: any) => (
+    <div data-testid="editor-status-bar" data-editor-exists={!!editor} />
+  ),
 }));
 
 import { Editor } from '../components/editor';
@@ -74,11 +76,11 @@ describe('Editor', () => {
     expect(useDocumentEditor).toHaveBeenCalledWith(expect.objectContaining({ onUpdate }));
   });
 
-  test('renders word count footer when editable', () => {
+  test('renders status bar footer when editable', () => {
     vi.mocked(useDocumentEditor).mockReturnValue({ id: 'mock-editor' } as any);
 
     render(<Editor editable={true} />);
 
-    expect(screen.getByTestId('word-count')).toBeDefined();
+    expect(screen.getByTestId('editor-status-bar')).toBeDefined();
   });
 });
