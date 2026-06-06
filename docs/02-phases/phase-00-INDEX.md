@@ -13,7 +13,7 @@ This index lists all 10 phases required to construct the Collabdoc application.
 - [x] [[02-phases/phase-07-persistence|Phase 07: Persistence & Offline Support (Days 25–28)]] — [[02-phases/phase-07-COMPLETE|✓ COMPLETE Summary]]
 - [x] [[02-phases/phase-08-versions|Phase 08: Version History (Days 29–33)]] — [[02-phases/phase-08-COMPLETE|✓ COMPLETE Summary]]
 - [x] [[02-phases/phase-09-sharing|Phase 09: Sharing & Permissions (Days 34–39)]] — [[02-phases/phase-09-COMPLETE|✓ COMPLETE Summary]]
-- [ ] [[02-phases/phase-10-deploy|Phase 10: Testing, Observability & Deployment (Days 40–49)]]
+- [x] [[02-phases/phase-10-deploy|Phase 10: Testing, Observability & Deployment (Days 40–49)]] — [[02-phases/phase-10-COMPLETE|✓ COMPLETE Summary]]
 
 **Reference:**
 
