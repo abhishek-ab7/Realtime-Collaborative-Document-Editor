@@ -28,6 +28,10 @@
       "outputs": [".next/**", "!.next/cache/**", "dist/**"],
       "env": ["CODECOV_TOKEN"]
     },
+    "@collabdoc/database#build": {
+      "dependsOn": [],
+      "outputs": ["../../node_modules/.prisma/client/**", "../../node_modules/@prisma/client/**"]
+    },
     "lint": {
       "dependsOn": ["^build"]
     },

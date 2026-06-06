@@ -11,7 +11,7 @@
     "db:seed": "prisma db seed",
     "db:studio": "prisma studio",
     "type-check": "tsc --noEmit",
-    "build": "echo 'No build needed'",
+    "build": "prisma generate",
     "test": "vitest run",
     "test:coverage": "vitest run --coverage --reporter=default --reporter=junit --outputFile.junit=test-report.junit.xml"
   },
