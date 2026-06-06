@@ -16,16 +16,22 @@ directly during sessions, without copy-pasting prompts.
 
 ### Step 2: Add to Antigravity Configuration
 
-In your Antigravity IDE configuration (typically in your system MCP servers list, accessible under developer tools/options):
+Configure the server in your Antigravity IDE configuration file (`~/.gemini/antigravity-ide/mcp_config.json`):
 
 ```json
 {
   "mcpServers": {
     "obsidian": {
       "command": "npx",
-      "args": ["-y", "mcp-obsidian"],
+      "args": [
+        "-y",
+        "mcp-remote",
+        "https://127.0.0.1:27124/mcp/",
+        "--header",
+        "Authorization: Bearer ee92114aa44d4bacc80295aba685dd8163897e42a8eb1de83f0fde93fa8bab9"
+      ],
       "env": {
-        "VAULT_PATH": "/home/abhi/Downloads/Realtime Collaborative Document Editor/docs"
+        "NODE_TLS_REJECT_UNAUTHORIZED": "0"
       }
     }
   }
