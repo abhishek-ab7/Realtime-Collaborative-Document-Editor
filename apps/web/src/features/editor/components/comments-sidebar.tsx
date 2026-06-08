@@ -69,32 +69,6 @@ export function CommentsSidebar({
     if (!doc) return;
     const yComments = doc.getArray<Comment>('comments');
 
-    // Seed default comments in Yjs array if it is brand new and empty
-    if (yComments.length === 0) {
-      doc.transact(() => {
-        yComments.push([
-          {
-            id: '1',
-            author: 'Sarah Jenkins',
-            avatarUrl: null,
-            content:
-              'Are we sure about the node clusters? I think we might hit a bottleneck if concurrent users exceed 500.',
-            time: '10:42 AM',
-            replies: [],
-          },
-          {
-            id: '2',
-            author: 'James Chen',
-            avatarUrl: null,
-            content:
-              "I've started drafting the security addendum. Will link it here when the first draft is ready for review.",
-            time: '11:15 AM',
-            replies: [],
-          },
-        ]);
-      });
-    }
-
     const observer = () => {
       setComments(yComments.toArray());
     };
