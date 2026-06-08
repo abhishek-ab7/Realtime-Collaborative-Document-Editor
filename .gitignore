@@ -24,3 +24,5 @@ docs/03-daily-logs/day-2026-06-06-progress.md
 progress.txt
 .vercel
 .env*.local
+.env.vercel.production
+.env.vercel.production
