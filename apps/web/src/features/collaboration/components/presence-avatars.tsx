@@ -19,12 +19,6 @@ export function PresenceAvatars() {
       >
         {visible.map((user, index) => {
           const color = PRESENCE_COLORS[index % PRESENCE_COLORS.length];
-          const initials = user.name
-            .split(' ')
-            .map((n) => n[0])
-            .join('')
-            .toUpperCase()
-            .slice(0, 2);
 
           return (
             <Tooltip key={user.userId}>

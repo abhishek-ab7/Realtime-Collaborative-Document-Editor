@@ -31,6 +31,11 @@ interface Pagination {
   totalPages: number;
 }
 
+interface SWRDocumentsData {
+  documents: Document[];
+  pagination: Pagination;
+}
+
 interface FetchDocumentsOptions {
   status?: 'ACTIVE' | 'TRASHED';
   starred?: boolean;
@@ -49,7 +54,10 @@ const fetcher = async (url: string) => {
   return response.json();
 };
 
-export function useDocuments(initialOptions: FetchDocumentsOptions = {}, fallbackData?: any) {
+export function useDocuments(
+  initialOptions: FetchDocumentsOptions = {},
+  fallbackData?: SWRDocumentsData,
+) {
   const [options, setOptions] = useState<FetchDocumentsOptions>({
     status: 'ACTIVE',
     sort: 'accessed',
@@ -109,20 +117,24 @@ export function useDocuments(initialOptions: FetchDocumentsOptions = {}, fallbac
   const toggleStar = useCallback(
     async (id: string, isStarred: boolean) => {
       await mutate(
-        async (current: any) => {
+        async (current: SWRDocumentsData | undefined) => {
           await updateDocument(id, { isStarred });
           if (!current) return current;
           return {
             ...current,
-            documents: current.documents.map((d: any) => (d.id === id ? { ...d, isStarred } : d)),
+            documents: current.documents.map((d: Document) =>
+              d.id === id ? { ...d, isStarred } : d,
+            ),
           };
         },
         {
-          optimisticData: (current: any) => {
+          optimisticData: (current: SWRDocumentsData | undefined) => {
             if (!current) return current;
             return {
               ...current,
-              documents: current.documents.map((d: any) => (d.id === id ? { ...d, isStarred } : d)),
+              documents: current.documents.map((d: Document) =>
+                d.id === id ? { ...d, isStarred } : d,
+              ),
             };
           },
           rollbackOnError: true,

@@ -11,9 +11,10 @@ import {
   ListOrdered,
   ListChecks,
   Table,
-  Image,
+  Image as ImageIcon,
   Sparkles,
 } from 'lucide-react';
+import type { Editor, Range } from '@tiptap/core';
 import { cn } from '@/lib/utils';
 
 const getIcon = (name: string) => {
@@ -41,7 +42,7 @@ const getIcon = (name: string) => {
     case 'table':
       return <Table className="h-4 w-4 text-slate-500" />;
     case 'image':
-      return <Image className="h-4 w-4 text-slate-500" />;
+      return <ImageIcon className="h-4 w-4 text-slate-500" />;
     case 'ai':
       return <Sparkles className="h-4 w-4 fill-indigo-100 text-indigo-500" />;
     default:
@@ -49,9 +50,16 @@ const getIcon = (name: string) => {
   }
 };
 
+export interface SlashCommandItem {
+  name: string;
+  description: string;
+  iconName: string;
+  command: (editor: Editor, range: Range) => void;
+}
+
 export interface SlashCommandMenuProps {
-  items: any[];
-  command: (item: any) => void;
+  items: SlashCommandItem[];
+  command: (item: SlashCommandItem) => void;
 }
 
 export const SlashCommandMenu = forwardRef((props: SlashCommandMenuProps, ref) => {

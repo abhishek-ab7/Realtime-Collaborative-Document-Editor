@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { Sparkles, X, Send, Loader2, Wand2 } from 'lucide-react';
 import type { Editor as TipTapEditor } from '@tiptap/react';
 import { cn } from '@/lib/utils';
@@ -42,6 +42,56 @@ export function AIAssistantPanel({
     }
   }, [messages]);
 
+  const handleSendPrompt = useCallback(
+    async (promptText: string) => {
+      if (!promptText.trim() || isPending) return;
+
+      const userMsg: Message = {
+        id: Date.now().toString(),
+        sender: 'user',
+        text: promptText,
+      };
+      setMessages((prev) => [...prev, userMsg]);
+      setInput('');
+      setIsPending(true);
+
+      try {
+        const context = editor?.getText() || '';
+        const response = await fetch(`/api/documents/${documentId}/ai`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ message: promptText, context, title: documentTitle }),
+        });
+
+        if (!response.ok) {
+          throw new Error('Failed to generate AI response');
+        }
+
+        const data = await response.json();
+        const aiMsg: Message = {
+          id: (Date.now() + 1).toString(),
+          sender: 'ai',
+          text: data.text || 'No suggestion received.',
+        };
+        setMessages((prev) => [...prev, aiMsg]);
+      } catch (error) {
+        console.error(error);
+        toast.error('AI assistant failed to generate response');
+        setMessages((prev) => [
+          ...prev,
+          {
+            id: (Date.now() + 1).toString(),
+            sender: 'ai',
+            text: 'Sorry, I encountered an error communicating with the AI service. Please verify your API keys and configuration.',
+          },
+        ]);
+      } finally {
+        setIsPending(false);
+      }
+    },
+    [documentId, documentTitle, editor, isPending],
+  );
+
   // Handle listening for event from slash command
   useEffect(() => {
     const handleSlashEvent = (e: Event) => {
@@ -53,54 +103,7 @@ export function AIAssistantPanel({
     };
     window.addEventListener('open-ai-assistant', handleSlashEvent);
     return () => window.removeEventListener('open-ai-assistant', handleSlashEvent);
-  }, [editor]);
-
-  const handleSendPrompt = async (promptText: string) => {
-    if (!promptText.trim() || isPending) return;
-
-    const userMsg: Message = {
-      id: Date.now().toString(),
-      sender: 'user',
-      text: promptText,
-    };
-    setMessages((prev) => [...prev, userMsg]);
-    setInput('');
-    setIsPending(true);
-
-    try {
-      const context = editor?.getText() || '';
-      const response = await fetch(`/api/documents/${documentId}/ai`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ message: promptText, context, title: documentTitle }),
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to generate AI response');
-      }
-
-      const data = await response.json();
-      const aiMsg: Message = {
-        id: (Date.now() + 1).toString(),
-        sender: 'ai',
-        text: data.text || 'No suggestion received.',
-      };
-      setMessages((prev) => [...prev, aiMsg]);
-    } catch (error) {
-      console.error(error);
-      toast.error('AI assistant failed to generate response');
-      setMessages((prev) => [
-        ...prev,
-        {
-          id: (Date.now() + 1).toString(),
-          sender: 'ai',
-          text: 'Sorry, I encountered an error communicating with the AI service. Please verify your API keys and configuration.',
-        },
-      ]);
-    } finally {
-      setIsPending(false);
-    }
-  };
+  }, [editor, handleSendPrompt]);
 
   const handleQuickAction = (action: string) => {
     let promptText = '';

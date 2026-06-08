@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import {
   Search,
   FileText,
@@ -41,7 +41,7 @@ export function CommandPalette({ isOpen, onClose, onOpenHistory, onOpenAI }: Com
   useEffect(() => {
     if (!isOpen) return;
 
-    setIsLoading(true);
+    Promise.resolve().then(() => setIsLoading(true));
     fetch('/api/documents?status=ACTIVE')
       .then((res) => {
         if (res.ok) return res.json();
@@ -61,9 +61,11 @@ export function CommandPalette({ isOpen, onClose, onOpenHistory, onOpenAI }: Com
   // Focus input when opened
   useEffect(() => {
     if (isOpen) {
-      setTimeout(() => inputRef.current?.focus(), 50);
-      setSelectedIndex(0);
-      setQuery('');
+      setTimeout(() => {
+        inputRef.current?.focus();
+        setSelectedIndex(0);
+        setQuery('');
+      }, 50);
     }
   }, [isOpen]);
 
@@ -174,42 +176,45 @@ export function CommandPalette({ isOpen, onClose, onOpenHistory, onOpenAI }: Com
     type: 'doc' | 'command' | 'action';
     name: string;
     description?: string;
-    icon: any;
+    icon: React.ComponentType<{ className?: string }> | React.ElementType;
     action: () => void;
   }
 
-  const flatItems: FlatItem[] = [
-    ...filteredDocs.map(
-      (doc): FlatItem => ({
-        type: 'doc',
-        name: doc.title,
-        description: `Last updated: ${new Date(doc.updatedAt).toLocaleDateString()}`,
-        icon: FileText,
-        action: () => {
-          router.push(`/d/${doc.id}`);
-          onClose();
-        },
-      }),
-    ),
-    ...filteredCommands.map(
-      (cmd): FlatItem => ({
-        type: 'command',
-        name: cmd.name,
-        description: cmd.description,
-        icon: cmd.icon,
-        action: cmd.action,
-      }),
-    ),
-    ...filteredActions.map(
-      (act): FlatItem => ({
-        type: 'action',
-        name: act.name,
-        description: act.description,
-        icon: act.icon,
-        action: act.action,
-      }),
-    ),
-  ];
+  const flatItems: FlatItem[] = useMemo(
+    () => [
+      ...filteredDocs.map(
+        (doc): FlatItem => ({
+          type: 'doc',
+          name: doc.title,
+          description: `Last updated: ${new Date(doc.updatedAt).toLocaleDateString()}`,
+          icon: FileText,
+          action: () => {
+            router.push(`/d/${doc.id}`);
+            onClose();
+          },
+        }),
+      ),
+      ...filteredCommands.map(
+        (cmd): FlatItem => ({
+          type: 'command',
+          name: cmd.name,
+          description: cmd.description,
+          icon: cmd.icon,
+          action: cmd.action,
+        }),
+      ),
+      ...filteredActions.map(
+        (act): FlatItem => ({
+          type: 'action',
+          name: act.name,
+          description: act.description,
+          icon: act.icon,
+          action: act.action,
+        }),
+      ),
+    ],
+    [filteredDocs, filteredCommands, filteredActions, router, onClose],
+  );
 
   // Keyboard navigation handler
   useEffect(() => {
@@ -375,7 +380,7 @@ function ItemRow({
   isSelected: boolean;
   title: string;
   description?: string;
-  icon: any;
+  icon: React.ComponentType<{ className?: string }> | React.ElementType;
   onClick: () => void;
   onMouseEnter: () => void;
 }) {

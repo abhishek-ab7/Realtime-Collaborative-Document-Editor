@@ -148,12 +148,13 @@ export function EditorHeader({
   }, [isEditing]);
 
   useEffect(() => {
-    setTitle(initialTitle);
+    Promise.resolve().then(() => setTitle(initialTitle));
   }, [initialTitle]);
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
-      setShowAutoSave(localStorage.getItem('collabdoc-auto-save') !== 'false');
+      const val = localStorage.getItem('collabdoc-auto-save') !== 'false';
+      Promise.resolve().then(() => setShowAutoSave(val));
     }
   }, []);
 

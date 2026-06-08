@@ -10,7 +10,6 @@ import {
   Monitor,
   Keyboard,
   Sliders,
-  Type,
 } from 'lucide-react';
 import { UserAvatar } from '@/components/ui/user-avatar';
 import { useState, useEffect } from 'react';
@@ -33,11 +32,13 @@ export default function SettingsPage() {
     if (typeof window === 'undefined') return;
     localStorage.removeItem('collabdoc-theme');
     document.documentElement.classList.remove('dark');
-    setFontSize(localStorage.getItem('collabdoc-font-size') || '16px');
-    setLineSpacing(localStorage.getItem('collabdoc-line-spacing') || '1.75');
-    setSpellCheck(localStorage.getItem('collabdoc-spell-check') !== 'false');
-    setAutoSave(localStorage.getItem('collabdoc-auto-save') !== 'false');
-    setPresenceCursors(localStorage.getItem('collabdoc-presence-cursors') !== 'false');
+    Promise.resolve().then(() => {
+      setFontSize(localStorage.getItem('collabdoc-font-size') || '16px');
+      setLineSpacing(localStorage.getItem('collabdoc-line-spacing') || '1.75');
+      setSpellCheck(localStorage.getItem('collabdoc-spell-check') !== 'false');
+      setAutoSave(localStorage.getItem('collabdoc-auto-save') !== 'false');
+      setPresenceCursors(localStorage.getItem('collabdoc-presence-cursors') !== 'false');
+    });
   }, []);
 
   const handleFontSizeChange = (size: string) => {

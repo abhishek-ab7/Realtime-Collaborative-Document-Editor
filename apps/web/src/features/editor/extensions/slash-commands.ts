@@ -1,15 +1,10 @@
-import { Extension } from '@tiptap/core';
-import Suggestion from '@tiptap/suggestion';
+import { Extension, Editor, Range } from '@tiptap/core';
+import Suggestion, { SuggestionProps } from '@tiptap/suggestion';
 import { ReactRenderer } from '@tiptap/react';
-import tippy from 'tippy.js';
-import { SlashCommandMenu } from '../components/slash-command-menu';
+import tippy, { Instance } from 'tippy.js';
+import { SlashCommandMenu, SlashCommandItem } from '../components/slash-command-menu';
 
-export interface CommandItem {
-  name: string;
-  description: string;
-  iconName: string;
-  command: (editor: any, range: any) => void;
-}
+export type CommandItem = SlashCommandItem;
 
 export const getSuggestionItems = ({ query }: { query: string }): CommandItem[] => {
   const items: CommandItem[] = [
@@ -168,15 +163,23 @@ export const SlashCommands = Extension.create({
         char: '/',
         startOfLine: true,
         items: ({ query }) => getSuggestionItems({ query }),
-        command: ({ editor, range, props }: any) => {
+        command: ({
+          editor,
+          range,
+          props,
+        }: {
+          editor: Editor;
+          range: Range;
+          props: { command: (editor: Editor, range: Range) => void };
+        }) => {
           props.command(editor, range);
         },
         render: () => {
-          let component: any;
-          let popup: any;
+          let component: ReactRenderer;
+          let popup: Instance;
 
           return {
-            onStart: (props) => {
+            onStart: (props: SuggestionProps) => {
               component = new ReactRenderer(SlashCommandMenu, {
                 props,
                 editor: props.editor,
@@ -187,7 +190,7 @@ export const SlashCommands = Extension.create({
               }
 
               popup = tippy(document.body, {
-                getReferenceClientRect: props.clientRect as any,
+                getReferenceClientRect: props.clientRect as () => DOMRect,
                 appendTo: () => document.body,
                 content: component.element,
                 showOnCreate: true,
@@ -197,7 +200,7 @@ export const SlashCommands = Extension.create({
               });
             },
 
-            onUpdate(props) {
+            onUpdate(props: SuggestionProps) {
               component.updateProps(props);
 
               if (!props.clientRect) {
@@ -205,7 +208,7 @@ export const SlashCommands = Extension.create({
               }
 
               popup.setProps({
-                getReferenceClientRect: props.clientRect as any,
+                getReferenceClientRect: props.clientRect as () => DOMRect,
               });
             },
 
