@@ -218,7 +218,13 @@ export const SlashCommands = Extension.create({
                 return true;
               }
 
-              return component.ref?.onKeyDown(props) ?? false;
+              return (
+                (
+                  component.ref as {
+                    onKeyDown: (props: { event: KeyboardEvent }) => boolean;
+                  }
+                )?.onKeyDown(props) ?? false
+              );
             },
 
             onExit() {
